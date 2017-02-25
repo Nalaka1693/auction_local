@@ -210,6 +210,7 @@ function createJSON(){
         role : role,
         email : email,
         mobile : telephone,
+        company: company,
         password : compassword
     };
     
@@ -316,4 +317,4 @@ window.onload = function(){
         var table = $('#users-table').DataTable();
    });
 
-}
+};
