@@ -12,16 +12,20 @@
     <title>E-Procurement System</title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="../../public/admin/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/admin/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="../../public/admin/css/sb-admin.css" rel="stylesheet">
+    <link href="/admin/css/sb-admin.css" rel="stylesheet">
     
-    <!-- Data Picker -->
+        <!-- Data Picker -->
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     
+    <!-- tagsinput-->
+    <link rel="stylesheet" href="/admin/css/bootstrap-tagsinput.css">
+
+
     <!-- Custom Fonts -->
-    <link href="../../public/admin/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="/admin/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -158,10 +162,10 @@
                     <li>
                         <a href="index.html"><i class="fa fa-fw fa-dashboard"></i> Dashboard</a>
                     </li>
-                    <li class="active">
+                    <li>
                         <a href="users.html"><i class="fa fa-fw fa-user"></i> Vendors and Users</a>
                     </li>
-                    <li>
+                    <li class="active">
                         <a href="auction.html"><i class="fa fa-fw fa-bar-chart-o"></i> Auctions</a>
                     </li>
                     <li>
@@ -180,113 +184,128 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <h1 class="page-header">
-                            Users
-                            <small>Vendors</small>
+                            Auctions
                         </h1>
                         <ol class="breadcrumb">
                             <li>
                                 <i class="fa fa-dashboard"></i>  <a href="index.html">Dashboard</a>
                             </li>
                             <li class="active">
-                                <i class="fa fa-file"></i> Users and Vendors
+                                <i class="fa fa-file"></i> Auctions
                             </li>
                         </ol>
                     </div>
                 </div>
-                
-                 <hr size="30">
-                
                 <!-- /.row -->
+                
+                <hr size="30">
+                
                 <div class="row">
                     <div class="col-lg-2">
-                        <button type="button" class="btn btn-default btn-success" style="display: block; width: 100%;" 
-                                data-toggle="modal"  id="new-user-btn">
-                            <i class="fa fa-user-plus pull-left" aria-hidden="true"></i>Add User 
-                        </button>
-                    </div>
-                    <div class="col-lg-1">
-                        <b> Filter By:  </b>
+                        <a class="btn btn-default btn-warning" style="display: block; width: 100%;" 
+                           data-toggle="modal" id="new-auc-add-btn">
+                            <i class="fa fa-user-plus pull-left" aria-hidden="true"></i>New Auction 
+                        </a>
                     </div>
                     <div class="col-lg-2">
-                         <input class="form-control" id="search-name-input" placeholder="Name">
+                        <input class="form-control" placeholder="Auction ID" id="search-aucid">
                     </div>
                     <div class="col-lg-2">
-                         <input class="form-control" id="search-company-input" placeholder="Company">
+                        <input class="form-control" placeholder="Auction Name" id=" search-auc-name">
                     </div>
                     <div class="col-lg-2">
-                         <input class="form-control" id="search-date-input" placeholder="Created Date">
+                        <input class="form-control" placeholder="From" id="search-auc-sdate">
                     </div>
                     <div class="col-lg-2">
-                        <a class="btn btn-default" id="search-btn" style="display: block; width: 75%;" href="#">
+                        <input class="form-control" placeholder="To" id="search-auc-edate">
+                    </div>
+                    <div class="col-lg-2">
+                        <a class="btn btn-default" style="display: block; width: 75%;" href="#" id="search-btn">
                             <i class="fa fa-search "></i> Search </a>
                     </div>
-                        
                 </div>
                 
-                <!--notification-->
+                <hr size="30">   
+            
+                <!-- row-->
+            
                 <div class="row">
-                    <div class="alert alert-dismissable collapse" id="notific">
-                        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                        <div id="notific-message">fsadfasf</div>
-                    </div>
-                </div>
-                <hr size="30">
-                    
-                
-                <!-- /.row -->
-                <div class="row">
-                    <div class="col-lg-10">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-striped">
+                    <div class="col-lg-8">
+                        <div class="panel panel-green">
+                            <div class="panel-heading">Pending Auctions</div>
+                            <div class="panel-body">
+                                <div class="table-responsive">
+                            <table class="table table-horver table-striped">
                                 <thead>
                                     <tr>
-                                        <th>User ID</th>
-                                        <th>Name</th>
-                                        <th>Role</th>
-                                        <th>Company</th>
+                                        <th>Auction ID</th>
+                                        <th>Auction Name</th>
+                                        <th>Due Date</th>
                                         <th>Options</th>
                                     </tr>
                                 </thead>
                                 <tbody id="table-body">
                                     <tr>
-                                        <td>user_1</td>
-                                        <td>John Doe</td>
-                                        <td>Admin</td>
-                                        <td>ABC company</td>
+                                        <td>20170221</td>
+                                        <td>HongKong Fabric</td>
+                                        <td>06-03-2017</td>
                                         <td>    
                                             <a class="editBtn btn btn-default btn-sm" href="#">
-                                            <i class="fa fa-pencil fa-fw"></i> Edit</a>
+                                            <i class="fa fa-pencil fa-fw"></i></a>
                                             <a class="delBtn btn btn-default btn-sm" href="#">
-                                            <i class="fa fa-trash fa-fw"></i> Delete</a>
+                                            <i class="fa fa-trash fa-fw"></i></a>
                                         </td>
                                     </tr>
-                                    
                                     <tr>
-                                        <td>/about.html</td>
-                                        <td>261</td>
-                                        <td>33.3%</td>
-                                        <td>$234.12</td>
+                                        <td>20170222</td>
+                                        <td>Tokyo fbraic 2</td>
+                                        <td>20-03-2017</td>
                                         <td>    
                                             <a class="btn btn-default btn-sm" href="#">
-                                            <i class="fa fa-pencil fa-fw"></i> Edit</a>
+                                            <i class="fa fa-pencil fa-fw"></i></a>
                                             <a class="btn btn-default btn-sm" href="#">
-                                            <i class="fa fa-trash fa-fw"></i> Delete</a>
+                                            <i class="fa fa-trash fa-fw"></i></a>
                                         </td>
+                                        
                                     </tr>
                                    
                                 </tbody>
                             </table>
                         </div>
+
+                            </div>
+                        </div>
                     </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="panel panel-danger">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"><i class="fa fa-clock-o fa-fw"></i> Ongoing Auctions</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="list-group">
+                                    <a href="#" class="list-group-item">
+                                        <span class="badge">just now</span>
+                                        <i class="fa fa-fw fa-calendar"></i> Auction 1                    
+                                    </a>
+                                    <a href="#" class="list-group-item">
+                                        <span class="badge">4 minutes ago</span>
+                                        <i class="fa fa-fw fa-calendar"></i> Auction 2
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
             </div>
             <!-- /.container-fluid -->
 
         </div>
         <!-- /#page-wrapper -->
-            
-        <!--  Add User Modal  -->
-        <div id="add-user-modal" class="modal fade" role="dialog">
+    
+        <!--  Add Auction Modal  -->
+        <div id="new-auction-modal" class="modal fade" role="dialog">
             <div class="modal-dialog">
                 
             <!--   modal content   -->
@@ -294,162 +313,84 @@
                     <div class="modal-header">
                         <!--    cross button   -->
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Add User</h4>
-                    </div>
-                    <form role="form" id="add-user">
-                        <div class="modal-body">
-                            <div class="row">
-                                <div class="col-lg-6">
-                                        <div class="form-group col-lg-12">
-                                            <label>User ID</label>
-                                            <input class="form-control" id="userid" style="width: 100%;">
-                                        </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                    <div class="col-lg-12">
-                                        <div class="form-group col-lg-6">
-                                            <label>First Name</label>
-                                            <input class="form-control" id="fname">
-                                        </div>
-                                        <div class="form-group col-lg-6">
-                                            <label>Last Name</label>
-                                            <input class="form-control" id="lname">
-                                        </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="container">
-                                        <div class="form-group">
-                                            <label>Role</label>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="role" id="role" value="Admin" checked>Admin
-                                                </label>
-                                            </div>
-                                            <div class="radio">
-                                                <label>
-                                                    <input type="radio" name="role" id="role" value="Vendor">Vendor
-                                                </label>
-                                            </div>
-                                        </div>
-                                </div>
-                            </div>
-                           <div class="row">
-                                       <div class="col-lg-12">
-                                        <div class="form-group">
-                                            <label>Comapany</label>
-                                            <input class="form-control" id="company">
-                                        </div>
-                                       </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-6">
-                                        <div class="form-group">
-                                            <label>Email</label>
-                                            <input class="form-control" id="email">
-                                        </div>
-                                </div>
-                                <div class="col-lg-6">
-                                        <div class="form-group">
-                                            <label>Telephone</label>
-                                            <input class="form-control" id="telephone">
-                                        </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-6">
-                                        <div class="form-group">
-                                            <label>Password</label>
-                                            <input type="password" class="form-control" id="userpw">
-                                        </div>
-                                </div>
-                                <div class="col-lg-6">
-                                        <div class="form-group">
-                                            <label>Confirm Password</label>
-                                            <input type="password" class="form-control" id="userpwcon">
-                                        </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-success" data-toggle="modal" id="add_user_btn" data-dismiss="modal">
-                                <div id="add-btn-label"></div>
-                            </button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        </div>
-                    </form>
-                </div>
-            </div>    
-        </div>
-            
-        <!--  Add user confirm Modal  -->
-        <div id="add-user-confirm-modal" class="modal fade" role="dialog">
-            <div class="modal-dialog">
-                
-            <!--   modal content   -->
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <!--    cross button   -->
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">User Detail</h4>
+                        <h4 class="modal-title">New Auction</h4>
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col-lg-2">
-                                <label>User ID </label>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Auction ID</label>
+                                    <input class="form-control" id="aucid">
+                                </div>
                             </div>
-                            <div class="col-lg-1">:</div>
                             <div class="col-lg-6">
-                                <div id="userId-label"></div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-2">Name </div>
-                            <div class="col-lg-1">:</div>
-                            <div class="col-lg-6">
-                                <div id="full-name"></div>
-                            </div>    
-                        </div>
-                        <div class="row">
-                            <div class="col-lg-2">Role</div>
-                            <div class="col-lg-1">:</div>
-                            <div class="col-lg-6">
-                                <div id="role-label"></div>
+                                <div class="form-group">
+                                    <label>Auction Name</label>
+                                    <input class="form-control" id="auc-name">
+                                </div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-lg-2">Email</div>
-                            <div class="col-lg-1">:</div>
-                            <div class="col-lg-6">
-                                <div id="email-label"></div>
+                            <div class="col-lg-10">
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    <textarea data-brackets-id="4840" class="form-control" rows="3" id="auc-desc"></textarea>
+                                </div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-lg-2">Telephone</div>
-                            <div class="col-lg-1">:</div>
                             <div class="col-lg-6">
-                                <div id="telephone-label"></div>
+                                <div class="form-group">
+                                    <label>Due Date</label>
+                                    <input class="form-control" id="due-date">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Start Time</label>
+                                    <input class="form-control" id="start-time">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>End Time</label>
+                                    <input class="form-control" id="end-time">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="col-lg-12">
+                                    <label >Vendors</label>
+                                    <input id="ven-list" class="form-control" type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group">
+                                <div class="col-lg-12">
+                                    <label >Items</label>
+                                    <input id="item-list" class="form-control" type="text">
+                                </div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-success" data-dismiss="modal"  
-                                id="confirm-user-btn">
-                                Confirm
+                        <button type="button" class="btn btn-success" data-dismiss="modal" id="win-add-auc-btn" >
+                            <div id="add-auc-window-au-btn"></div>
                         </button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal" id="confirm-user-close-btn">Close</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>    
         </div>
         
-       
-            
-        <!--  Delete User modal  -->
-        <div id="del-user-confirm-modal" class="modal fade" role="dialog">
+
+        <!--  Add auction confirm Modal  -->
+        <div id="add-auc-conf-modal" class="modal fade" role="dialog">
             <div class="modal-dialog">
                 
             <!--   modal content   -->
@@ -457,44 +398,115 @@
                     <div class="modal-header">
                         <!--    cross button   -->
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Delete User</h4>
+                        <h4 class="modal-title">Auction Detail</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-3">Auction ID</div>
+                            <div class="col-lg-1">:</div>
+                            <div class="col-lg-6" id="aucid-label"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3">Auction Name</div>
+                            <div class="col-lg-1">:</div>
+                            <div class="col-lg-6" id="aucname-label"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3">Description</div>
+                            <div class="col-lg-1">:</div>
+                            <div class="col-lg-6" id="aucdesc-label"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3">Due Date</div>
+                            <div class="col-lg-1">:</div>
+                            <div class="col-lg-6" id="duedate-label"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3">Start Time</div>
+                            <div class="col-lg-1">:</div>
+                            <div class="col-lg-6" id="stime-label"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3">End Time</div>
+                            <div class="col-lg-1">:</div>
+                            <div class="col-lg-6" id="etime-label"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3">Item List</div>
+                            <div class="col-lg-1">:</div>
+                            <div class="col-lg-6" id="itemlist-label"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3">Vendor List</div>
+                            <div class="col-lg-1">:</div>
+                            <div class="col-lg-6" id="venlist-label"></div>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-dismiss="modal"  
+                                id="win-conf-auc-btn">
+                                Confirm
+                        </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal" id="conf-close-btn">Close</button>
+                    </div>
+                    
+                </div>
+            </div>    
+        </div>
+
+        
+        <!--  Delete Auction modal  -->
+        <div id="del-auction-confirm-modal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                
+            <!--   modal content   -->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <!--    cross button   -->
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Delete Auction</h4>
                     </div>
                     <div class="modal-body">
                         <div class="row">
                             <div class="col-lg-12">
-                                <label id="del-usr-name-label"></label>
+                                <label id="del-auc-name-label"></label>
                             </div>
                         </div>
                     </div>
                     
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-danger" data-dismiss="modal"  id="del-user-btn">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"  id="del-auc-btn">
                                 Yes
                         </button>
-                        <button type="button" class="btn btn-default" data-dismiss="modal" id="del-user-close-btn">No</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal" id="del-auc-close-btn">No</button>
                     </div>
                 </div>
             </div>    
         </div>
+
+    
+        
 
 
     </div>
     <!-- /#wrapper -->
 
     <!-- jQuery -->
-    <script src="../../public/admin/js/jquery.js"></script>
+    <script src="/admin/js/jquery.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="../../public/admin/js/bootstrap.min.js"></script>
-        
-    <!-- Sup libs-->
+    <script src="/admin/js/bootstrap.min.js"></script>
+    
+        <!-- Sup libs-->
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="/admin/js/typeahead.js"></script>
+    <script src="/admin/js/bootstrap-tagsinput.js"></script>
+  
  
         
     <!--    page script file-->
-    <script src="../../public/admin/js/user.js" type="text/javascript"></script>
-        
-        
+    <script src="/admin/js/auction.js" type="text/javascript"></script>
 
 </body>
 

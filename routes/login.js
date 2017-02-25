@@ -39,7 +39,7 @@ router.post('/logpost', function(req, res, next) {
 
             if (data.passwd == results[0].password) {
                 if (results[0].role == 'admin') {
-                    res.json({"data": 'Admin login successful'});
+                    res.sendFile(__dirname + '/admin_pages/index.html');
                 } else if (results[0].role == 'vendor') {
                     res.send('Vendor login successful');
                 }

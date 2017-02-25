@@ -10,14 +10,14 @@ var newobj = {
             'user_id' : '1234568',
             'fname' : 'deshan',
             'lname' : 'kalupahana',
-            'role' : 'admin',
+            'role' : 'admin_pages',
             'company' : 'abc'
         },
         {
             'user_id' : '5886552',
             'fname' : 'john',
             'lname' : 'doe',
-            'role' : 'admin',
+            'role' : 'admin_pages',
             'company' : 'opsl'
         }
     ]
