@@ -1,7 +1,7 @@
 //---------------gloabal variables-----------------//
 
-var userID, fname, lname, role, email, password, compassword, company, telephone;
-var nameInput, companyInput, dateInput, deluid, hiderow;
+var userID, fname, lname, role, email, password, compassword, company, telephone,datec;
+var deluid, hiderow;
 var adduserenabled = true;
 var newobj = {
  'data':
@@ -10,14 +10,14 @@ var newobj = {
             'user_id' : '1234568',
             'fname' : 'deshan',
             'lname' : 'kalupahana',
-            'role' : 'admin_pages',
+            'role' : 'admin',
             'company' : 'abc'
         },
         {
             'user_id' : '5886552',
             'fname' : 'john',
             'lname' : 'doe',
-            'role' : 'admin_pages',
+            'role' : 'admin',
             'company' : 'opsl'
         }
     ]
@@ -123,13 +123,13 @@ $("#confirm-user-btn").click(function (d){
     if(adduserenabled){
         //add user ajax db req
         var obj = createJSON();
-        var path = "http://localhost:3000/users/add"; //give path
+        var path = "http://127.0.0.1:3000/users/add"; //give path
         sendDatabyPost(path,obj,"New User is added");
     }
     else{
         //update user db req
         var obj = createJSON();
-        var path = "http://localhost:3000/users/edit/confirm"; //give path
+        var path = "http://127.0.0.1:3000/users/edit"; //give path
         sendDatabyPost(path,obj,"User statys updated");
     }
     clearForm();
@@ -137,48 +137,28 @@ $("#confirm-user-btn").click(function (d){
 
 
 
-
-// Main Window - Search Button
-$("#search-btn").click(function (d){
-    nameInput = $("#search-name-input").val();
-    companyInput = $("#search-company-input").val();
-    dateInput = $("#search-date-input").val();
-    
-    
-    
-    if(!checkEmpty(nameInput) && !checkEmpty(companyInput && !dateInput(dateInput))){
-        var obj = {"name":nameInput, "company":companyInput,"date":dateInput};
-    }
-    else if(!checkEmpty(nameInput) && !checkEmpty(companyInput)){
-        var obj = {"name":nameInput, "company":companyInput};
-    }
-    else if(!checkEmpty(nameInput) && !checkEmpty(dateInput)){
-        var obj = {"name":nameInput, "date":dateInput};
-    }
-    else if(!checkEmpty(companyInput) && !checkEmpty(dateInput)){
-        var obj = {"company":companyInput,"date":dateInput};
-    }
-    else if(!checkEmpty(nameInput)){
-        var obj = {"name":nameInput};
-        sendDatatoUpdate("/dfasdf",obj,"hwllo");
-    }
-    else if(!checkEmpty(companyInput)){
-        var obj = {"company":companyInput};
-    }
-    else if(!checkEmpty(dateInput)){
-        var obj = {"date":dateInput};
-    }
-    else {}
-    
-});
-
-
-
 // Main Window - Table - Edit Btn
 $(document).on('click','.editBtn',function (d){
     var uid = this.parentNode.parentNode.childNodes[0].innerHTML;
+    var obj = {"user_id":uid};
     adduserenabled=false;
     //update form
+    $.ajax({
+        url : "http://127.0.0.1:3000/loadEdit",
+        type : "POST",
+        data : obj,
+        success : function(data,textStatus,jqXHR){
+            userID = data.user_id;
+            fname = data.fname;
+            lname = data.lname;
+            role = data.role;
+            email = data.email;
+            company = data.company;
+            password = data.password;
+            compassword = data.password;
+            telephone = data.mobile;
+        }
+    });
     
     setAddForm()
     $("#userid").prop('disabled',true);
@@ -202,7 +182,7 @@ $(document).on('click','.delBtn',function (d){
 // Del confirm window - yes
 $("#del-user-btn").click(function(d) {
     var json = { "user_id" : deluid };
-    var path = "mamf/dsfa.sf"; //give path
+    var path = "http://127.0.0.1:3000"; //give path
     sendDatabyPost(path,json,"User Removed from the System");
 });
 
@@ -288,6 +268,7 @@ function filterTable(obj){
     var tlname = obj.lname;
     var trole = obj.role;
     var tcompany = obj.company;
+    var tdatecreated = obj.date_created;
     
     $("#table-body").append(
         "<tr>"+
@@ -295,11 +276,12 @@ function filterTable(obj){
             "<td>" + tfname + " " + tlname +"</td>"+
             "<td>" + trole + "</td>"+
             "<td>" + tcompany + "</td>"+
+            "<td>" + tdatecreated + "</td>" +
             "<td>"+    
-                '<a class="editBtn btn btn-default btn-sm" href="#">'+
-                '<i class="fa fa-pencil fa-fw"></i> Edit</a>'+
-                '<a class="delBtn btn btn-default btn-sm" href="#">'+
+                '<a class="delBtn btn btn-default btn-sm pull-right" href="#">'+
                 '<i class="fa fa-trash fa-fw"></i> Delete</a>'+
+                '<a class="editBtn btn btn-default btn-sm pull-right" href="#">'+
+                '<i class="fa fa-pencil fa-fw"></i> Edit</a>'+
             "</td>"+
         "</tr>"
     );
@@ -317,8 +299,21 @@ function loadtable(data){
     datao.data.forEach(filterTable);
 }
 
+
+//-----------------Ajax reqs -------------------------//
+
+
+
 //-----------------------onload---------------------------//
 window.onload = function(){
+    
     $("#search-date-input").datepicker();
+    
+    
+    //table format
+   $(document).ready(function() {
+        // DataTable
+        var table = $('#users-table').DataTable();
+   });
 
 }

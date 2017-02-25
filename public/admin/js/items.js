@@ -1,7 +1,7 @@
 //------------------global variables -------------------//
 var additemenabled = true;
 var itemid, itemname, itemdesc;
-var sitemid, sitemname,deluid;
+var deluid;
 
 
 //-------------------all btns---------------------------//
@@ -31,22 +31,6 @@ $(document).on('click','.delBtn',function(d){
     var name =  this.parentNode.parentNode.childNodes[1].innerHTML;
     $("#del-item-name-label").text(name);
     $("#del-item-confirm-modal").modal();
-})
-
-//main window - search
-$("#search-item-btn").click(function (d){
-    getFormSearchData();
-    if(!checkEmpty(sitemid) && !checkEmpty(sitemname)){
-        
-    }
-    else if(!checkEmpty(sitemid)){
-        
-    }
-    else if(!checkEmpty(sitemname)){
-        
-    }
-    else{}
-    
 })
 
 
@@ -120,12 +104,6 @@ function setConWinData(){
     $("#itemdesc-label").text(itemdesc);
 }
 
-//get search data
-function getFormSearchData(){
-    sitemid = $("#search-itemid").val();
-    sitemname = $("#search-item-name").val();
-}
-    
     
     
 //-------------------support functions ----------------------//
@@ -156,11 +134,11 @@ function filterTable(obj){
             "<td>" + tid + "</td>"+
             "<td>" + tiname +"</td>"+
             "<td>" + tidesc+ "</td>"+
-            "<td>"+    
-                '<a class="editBtn btn btn-default btn-sm" href="#">'+
-                '<i class="fa fa-pencil fa-fw"></i> Edit</a>'+
-                '<a class="delBtn btn btn-default btn-sm" href="#">'+
+            "<td>"+   
+                '<a class="delBtn btn btn-default btn-sm pull-right" href="#">'+
                 '<i class="fa fa-trash fa-fw"></i> Delete</a>'+
+                '<a class="editBtn btn btn-default btn-sm pull-right" href="#">'+
+                '<i class="fa fa-pencil fa-fw"></i> Edit</a>'+
             "</td>"+
         "</tr>"
     );
@@ -213,5 +191,5 @@ function loadtable(data){
 
 //--------------------onload------------------------------//
 window.onload = function(){
-    
+    $('#item-table').DataTable();
 }

@@ -45,29 +45,11 @@ $(document).on('click','.delBtn',function (d){
 $("#search-btn").click(function(d) {
     getDatafromSearch();
     
-    if(!checkEmpty(s_aucid) && !checkEmpty(s_aucname) && !checkEmpty(s_sdate) && !checkEmpty(s_edate)){
-        var obj = {"auction_id":s_aucid, "name":s_aucname, "start_date":s_sdate, "end_date":s_edate };
-        
-    }
-    else if(!checkEmpty(s_aucid) && !checkEmpty(s_aucname)){
-        var obj = {"auction_id":s_aucid, "name":s_aucname };
-    }
-    else if(!checkEmpty(s_aucid) && !checkEmpty(s_sdate) && !checkEmpty(s_edate)){
-        var obj = {"auction_id":s_aucid,"start_date":s_sdate, "end_date":s_edate };
-    }
-    else if(!checkEmpty(s_aucname) && !checkEmpty(s_sdate) && !checkEmpty(s_edate)){
-        var obj = {"name":s_aucname, "start_date":s_sdate, "end_date":s_edate };
-    }
-    else if(!checkEmpty(s_aucid)){
-        var obj = {"auction_id":s_aucid};
-    }
-    else if(!checkEmpty(s_aucname)){
-        var obj = {"name":s_aucname};
-    }
-    else if(!checkEmpty(s_sdate) && !checkEmpty(s_edate)){
+    if(!checkEmpty(s_sdate) && !checkEmpty(s_edate)){
+        //serch
         var obj = {"start_date":s_sdate, "end_date":s_edate };
     }
-    else{}
+    
     
     
     
@@ -120,7 +102,6 @@ function clearDataAddForm(){
     $("#end-time").val("");
     $("#ven-list").val("");
     $("#item-list").val("");
-    //
 }
 
 
@@ -133,12 +114,19 @@ function setDataAddForm(){
     $("#due-date").val(duedate);
     $("#start-time").val(stime);
     $("#end-time").val(etime);
-    
-    //populate tag list on window
-    //
+    vendors.forEach(setDataOnEditVendor);
+    items.forEach(setDataOnEditItems);
+
+
 }
 
+function setDataOnEditVendor(obj){
+    $("#ven-list").tagsinput('add',obj);
+}
 
+function setDataOnEditItems(obj){
+     $("#item-list").tagsinput('add',obj);
+}
 
 //set data on conf modal
 function setDataOnConf(){
@@ -154,8 +142,7 @@ function setDataOnConf(){
 
 // get date from search
 function getDatafromSearch(){
-    s_aucid = $("#search-aucid").val();
-    s_aucname = $("#search-auc-name").val();
+
     s_sdate = $("#search-auc-sdate").val();
     s_edate = $("#search-auc-edate").val();
 }
@@ -185,6 +172,11 @@ $('#ven-list').tagsinput({
         displayKey:'name',
         valueKey:'id',
         source:vendorn.ttAdapter()
+    },
+    freeInput:true,
+    allowDuplicates:false,
+    onTagExists: function(item, $tag) {
+        $tag.hide().fadeIn();
     }
 });
 
@@ -194,6 +186,11 @@ $('#item-list').tagsinput({
         displayKey:'name',
         valueKey:'id',
         source:itemlist.ttAdapter()
+    },
+    freeInput:true,
+    allowDuplicates:false,
+    onTagExists: function(item, $tag) {
+        $tag.hide().fadeIn();
     }
 });
 
@@ -210,7 +207,8 @@ function createJSON(){
         due_date : duedate,
         start_time : stime,
         end_time : etime,
-        vendor :
+        vendor : vendors,
+        item : items
     }
     return json;
 }
@@ -228,10 +226,10 @@ function filterTable(obj){
             "<td>" + aucname +"</td>"+
             "<td>" + duedate+ "</td>"+
             "<td>"+    
-                '<a class="editBtn btn btn-default btn-sm" href="#">'+
-                '<i class="fa fa-pencil fa-fw"></i> Edit</a>'+
-                '<a class="delBtn btn btn-default btn-sm" href="#">'+
+                '<a class="delBtn btn btn-default btn-sm pull-right" href="#">'+
                 '<i class="fa fa-trash fa-fw"></i> Delete</a>'+
+                '<a class="editBtn btn btn-default btn-sm pull-right" href="#">'+
+                '<i class="fa fa-pencil fa-fw"></i> Edit</a>'+
             "</td>"+
         "</tr>"
     );
@@ -285,4 +283,5 @@ function loadtable(data){
 window.onload = function(){
     $("#search-auc-sdate").datepicker();
     $("#search-auc-edate").datepicker();
+    $("#auc-table").DataTable();
 }

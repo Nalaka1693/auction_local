@@ -64,7 +64,7 @@ router.post('/edit', function(req, res, next) {
         comp: req.body.company,
         pwd: req.body.password
     };
-
+    console.log(req.body);
     pg.connect(connectionString, function(err, client, done) {
         // Handle connection errors
         if(err) {
@@ -129,7 +129,7 @@ router.delete('/del', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
     const data = { uid: req.body.user_id };
-
+    console.log(req.body.user_id);
     pg.connect(connectionString, function(err, client, done) {
         // Handle connection errors
         if(err) {
