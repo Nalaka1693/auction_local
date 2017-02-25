@@ -230,6 +230,7 @@ function createJSON(){
         role : role,
         email : email,
         mobile : telephone,
+        company: company,
         password : compassword
     };
     
@@ -321,4 +322,4 @@ function loadtable(data){
 window.onload = function(){
     $("#search-date-input").datepicker();
 
-}
+};

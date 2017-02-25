@@ -61,3 +61,6 @@ ADD FOREIGN KEY (AUCTION_ID) REFERENCES AUCTION;
 /////////adding entries
 INSERT INTO users(user_id, fname, lname, role, email, date_created, mobile, company, password)
  values('mas_admin, 'Nalaka', 'Raja', 'admin', 'nalaka@gmail.com', '2017-02-17', '0771234567', 'IBM');
+
+INSERT INTO users(user_id, fname, lname, role, email, date_created, mobile, company, password)
+ values('mas_admin2', 'Deshan', 'Kalu', 'admin', 'deshan@gmail.com', current_date, '0771234567', 'IBM', '1234');
