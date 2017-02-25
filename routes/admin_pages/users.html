@@ -12,16 +12,17 @@
     <title>E-Procurement System</title>
 
     <!-- Bootstrap Core CSS -->
-    <link href="/admin/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Custom CSS -->
-    <link href="/admin/css/sb-admin.css" rel="stylesheet">
+    <link href="css/sb-admin.css" rel="stylesheet">
     
     <!-- Data Picker -->
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/dataTables.bootstrap4.min.css">
     
     <!-- Custom Fonts -->
-    <link href="/admin/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -183,6 +184,12 @@
                             Users
                             <small>Vendors</small>
                         </h1>
+                        <div class="col-lg-2 pull-right">
+                            <button type="button" class="btn btn-default btn-success" style="display: block; width: 100%;" 
+                                    data-toggle="modal"  id="new-user-btn">
+                                <i class="fa fa-user-plus pull-left" aria-hidden="true"></i>Add User 
+                            </button>
+                        </div>
                         <ol class="breadcrumb">
                             <li>
                                 <i class="fa fa-dashboard"></i>  <a href="index.html">Dashboard</a>
@@ -192,58 +199,24 @@
                             </li>
                         </ol>
                     </div>
-                </div>
-                
-                 <hr size="30">
-                
-                <!-- /.row -->
-                <div class="row">
-                    <div class="col-lg-2">
-                        <button type="button" class="btn btn-default btn-success" style="display: block; width: 100%;" 
-                                data-toggle="modal"  id="new-user-btn">
-                            <i class="fa fa-user-plus pull-left" aria-hidden="true"></i>Add User 
-                        </button>
-                    </div>
-                    <div class="col-lg-1">
-                        <b> Filter By:  </b>
-                    </div>
-                    <div class="col-lg-2">
-                         <input class="form-control" id="search-name-input" placeholder="Name">
-                    </div>
-                    <div class="col-lg-2">
-                         <input class="form-control" id="search-company-input" placeholder="Company">
-                    </div>
-                    <div class="col-lg-2">
-                         <input class="form-control" id="search-date-input" placeholder="Created Date">
-                    </div>
-                    <div class="col-lg-2">
-                        <a class="btn btn-default" id="search-btn" style="display: block; width: 75%;" href="#">
-                            <i class="fa fa-search "></i> Search </a>
-                    </div>
-                        
-                </div>
-                
-                <!--notification-->
-                <div class="row">
-                    <div class="alert alert-dismissable collapse" id="notific">
-                        <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-                        <div id="notific-message">fsadfasf</div>
-                    </div>
-                </div>
-                <hr size="30">
                     
+                </div>
+                
+
+
                 
                 <!-- /.row -->
                 <div class="row">
-                    <div class="col-lg-10">
+                    <div class="col-lg-12">
                         <div class="table-responsive">
-                            <table class="table table-hover table-striped">
+                            <table class="display table table-hover table-striped" id="users-table">
                                 <thead>
                                     <tr>
                                         <th>User ID</th>
                                         <th>Name</th>
                                         <th>Role</th>
                                         <th>Company</th>
+                                        <th>Created Date</th>
                                         <th>Options</th>
                                     </tr>
                                 </thead>
@@ -253,6 +226,7 @@
                                         <td>John Doe</td>
                                         <td>Admin</td>
                                         <td>ABC company</td>
+                                        <td>16-02-2017</td>
                                         <td>    
                                             <a class="editBtn btn btn-default btn-sm" href="#">
                                             <i class="fa fa-pencil fa-fw"></i> Edit</a>
@@ -266,6 +240,7 @@
                                         <td>261</td>
                                         <td>33.3%</td>
                                         <td>$234.12</td>
+                                        <td>55323</td>
                                         <td>    
                                             <a class="btn btn-default btn-sm" href="#">
                                             <i class="fa fa-pencil fa-fw"></i> Edit</a>
@@ -482,17 +457,19 @@
     <!-- /#wrapper -->
 
     <!-- jQuery -->
-    <script src="/admin/js/jquery.js"></script>
+    <script src="js/jquery.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
-    <script src="/admin/js/bootstrap.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
         
     <!-- Sup libs-->
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap4.min.js"></script>
  
         
     <!--    page script file-->
-    <script src="/admin/js/user.js" type="text/javascript"></script>
+    <script src="./js/user.js" type="text/javascript"></script>
         
         
 

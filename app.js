@@ -4,6 +4,9 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var Promise = require('es6-promise').Promise;
+var cors = require('cors');
+
 
 var bids = require('./routes/bids');
 var index = require('./routes/index');
@@ -26,6 +29,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'routes')));
+app.use(cors());
+app.options('*', cors());
+
 
 app.use('/', login);
 app.use('/bids', bids);
