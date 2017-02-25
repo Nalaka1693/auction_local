@@ -1,0 +1,26 @@
+{
+ 'data':
+    [
+        {
+            'user_id' : '1234568',
+            'fname' : 'deshan',
+            'lname' : 'kalupahana',
+            'role' : 'admain',
+            'company' : 'abc'
+        },
+        {
+            'user_id' : '5886552',
+            'fname' : 'john',
+            'lname' : 'doe',
+            'role' : 'admin',
+            'company' : 'opsl'
+        },
+         {
+            'user_id' : '2315213',
+            'fname' : 'solo',
+            'lname' : 'rogers',
+            'role' : 'vendor',
+            'company' : 'fsll;'
+        }
+    ]
+}
