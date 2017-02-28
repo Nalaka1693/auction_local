@@ -223,8 +223,8 @@ function createJSON(){
         role : role,
         email : email,
         mobile : telephone,
-        password : compassword,
-        company: company
+        company: company,
+        password : compassword
     };
     
     
@@ -342,6 +342,7 @@ window.onload = function(){
     p_data = {"data":[]};
     tablerefresh();
 
+
 }
 
 //table format
@@ -349,3 +350,5 @@ $(document).ready(function() {
     // DataTable
     sendDatatoUpdate({},'http://127.0.0.1:3000/users/initial');
 });
+
+
