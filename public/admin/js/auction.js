@@ -34,7 +34,7 @@ $(document).on('click','.editBtn',function (d){
 		dataType : "json",
 		data : obj,
 		success: function(data, textStatus,jqXHR){
-			var response = jqXHR.responseJSON[0];
+			var response = jqXHR.responseJSON;
 			aucid = response.auction_id;
 			aucname = response.name;
 			aucdesc = response.description;
@@ -44,10 +44,30 @@ $(document).on('click','.editBtn',function (d){
 			vendors = response.vendors;
 			items = response.items;
 			vendors.forEach(function(data){
-				
+				$.ajax({
+					url:"http://127.0.0.1:3000/users/vendor",
+					type: "POST",
+					dataType: "json",
+					data : {"user_id":data},
+					success:function(data,textStatus,jqXHR){
+						var res = res.responseJSON;
+						var nobj = {"name":res.fname+" "+res.lname+"-"+res.user_id};
+						n_vendors.push(nobj);
+					}
+				})
 			});
 			items.forEach(function(data){
-				
+				$.ajax({
+					url:"http://127.0.0.1:3000/items/iteml",
+					type: "POST",
+					dataType: "json",
+					data : {"item_id":data},
+					success:function(data,textStatus,jqXHR){
+						var res = res.responseJSON;
+						var nobj = {"name":res.item_name+"-"+res.item_id};
+						n_items.push(nobj);
+					}
+				})
 			});
 			setDataAddForm();
 			$("#aucid").prop('disabled',true);
@@ -231,11 +251,11 @@ function createJSON(){
 function filterTable(obj){
     var tid = obj.auction_id;
     var tiname = obj.name;
-    var due_date = obj.due_date;
+    var due_date = obj.due_date.substring(0,10);
 	var btn = '<a class="delBtn btn btn-default btn-sm pull-right" href="#">'+
-                '<i class="fa fa-trash fa-fw"></i> Delete</a>'+
+                '<i class="fa fa-trash fa-fw"></i> </a>'+
                 '<a class="editBtn btn btn-default btn-sm pull-right" href="#">'+
-                '<i class="fa fa-pencil fa-fw"></i> Edit</a>';
+                '<i class="fa fa-pencil fa-fw"></i></a>';
     var newobj = {
 		"auction_id":tid,
 		"name": tiname,
@@ -253,7 +273,7 @@ function tablerefresh(){
 		"aoColumns":[
 			{"data":"auction_id"},
 			{"data":"name"},
-			{"data":"due_data"},
+			{"data":"due_date"},
 			{"data":"btn"}
 		]
 	});
@@ -268,7 +288,7 @@ function sendDatatoUpdate(jsonO,path,sucfunc,message){
         dataType : 'json',
         data : jsonO,
         success:function(data,textStatus,jqXHR){
-            var table_data = jqXHR.responsJSON;
+            var table_data = jqXHR.responseJSON;
 			p_data.data = [];
 			table_data.forEach(filterTable);
 			table.destroy();
@@ -316,8 +336,8 @@ window.onload = function(){
     $("#search-auc-sdate").datepicker();
     $("#search-auc-edate").datepicker();
 	$("#due-date").datepicker();
-	$("#start-time").timepicker();
-	$("#end-time").timepicker();
+//	$("#start-time").timepicker();
+//	$("#end-time").timepicker();
 	tablerefresh();
 	sendDatatoUpdate({},"http://127.0.0.1:3000/auctions/initial");
      
