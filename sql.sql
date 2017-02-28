@@ -60,7 +60,15 @@ ADD FOREIGN KEY (AUCTION_ID) REFERENCES AUCTION;
 
 /////////adding entries
 INSERT INTO users(user_id, fname, lname, role, email, date_created, mobile, company, password)
- values('mas_admin, 'Nalaka', 'Raja', 'admin', 'nalaka@gmail.com', '2017-02-17', '0771234567', 'IBM');
+ values('mas_admin', 'Nalaka', 'Raja', 'admin', 'nalaka@gmail.com', '2017-02-17', '0771234567', 'IBM');
 
 INSERT INTO users(user_id, fname, lname, role, email, date_created, mobile, company, password)
  values('mas_admin2', 'Deshan', 'Kalu', 'admin', 'deshan@gmail.com', current_date, '0771234567', 'IBM', '1234');
+
+INSERT INTO items(item_id, item_name, description)
+ values('FAB002', 'Fabric', 'Fabric for bras');
+
+INSERT INTO auction(auction_id, description, name, due_date, start_time, end_time, date_created, created_by)
+ values('AUC001', 'Auction for buying fabrics', 'Fabric', '2017-01-01', '20:00:00', '21:00:00', '2016-12-20', 'mas_admin');
+INSERT INTO auction(auction_id, description, name, due_date, start_time, end_time, date_created, created_by)
+ values('AUC002', 'Auction for buying Metal', 'Metal', '2017-01-05', '20:00:00', '21:00:00', '2016-05-3', 'mas_admin');

@@ -10,6 +10,37 @@ router.get('/', function(req, res, next) {
     res.send('auctions');
 });
 
+router.get('/initial', function(req, res, next) {
+    const results = [];
+    // Get a Postgres client from the connection pool
+    const data = {
+        auc_id: req.body.auction_id,
+        name: req.body.name,
+        due_date: req.body.due_date
+    };
+
+    pg.connect(connectionString, function(err, client, done) {
+        // Handle connection errors
+        if(err) {
+            done();
+            console.log(err);
+            return res.status(500).json({success: false, data: err});
+        }
+        // SQL Query > Insert Data
+        const query = client.query("SELECT * FROM auctions");
+        // Stream results back one row at a time
+        query.on('row', function(row) {
+            results.push(row);
+        });
+        // After all data is returned, close connection and return results
+        query.on('end', function() {
+            done();
+            // console.log(results);
+            return res.json(results);
+        });
+    });
+});
+
 router.post('/new', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
@@ -34,11 +65,11 @@ router.post('/new', function(req, res, next) {
             return res.status(500).json({success: false, data: err});
         }
 
-        vendors.forEach(function (vendor) {
+        data.vendors.forEach(function (vendor) {
             client.query("INSERT INTO auction_vendors (auction_id, vendor_id) values ($1, $2)", [data.auc_id, vendor]);
         });
 
-        vendors.forEach(function (item) {
+        data.items.forEach(function (item) {
             client.query("INSERT INTO auction_items (auction_id, item_id) values ($1, $2)", [data.auc_id, item]);
         });
 
@@ -122,38 +153,6 @@ router.delete('/del', function(req, res, next) {
             // console.log(results);
             // return res.json(results[0].password);
             return res.json({"msg": 'Auction deleted successfully'});
-        });
-    });
-});
-
-router.get('/search', function(req, res, next) {
-    const results = [];
-    // Get a Postgres client from the connection pool
-    const data = {
-        auc_id: req.body.auction_id,
-        name: req.body.name,
-        due_date: req.body.due_date
-    };
-
-    pg.connect(connectionString, function(err, client, done) {
-        // Handle connection errors
-        if(err) {
-            done();
-            console.log(err);
-            return res.status(500).json({success: false, data: err});
-        }
-        // SQL Query > Insert Data
-        const query = client.query("INSERT INTO auction(auction_id, description, name, due_date, start_time, end_time, date_created, created_by) values($1, $2, $3, $4, $5, $6, $7, $8)",
-            [data.auc_id, data.descrip, data.name, data.due_date, data.s_time, data.e_time, data.date_cr, data.cr_user]);
-        // Stream results back one row at a time
-        query.on('row', function(row) {
-            results.push(row);
-        });
-        // After all data is returned, close connection and return results
-        query.on('end', function() {
-            done();
-            // console.log(results);
-            return res.json(results);
         });
     });
 });
