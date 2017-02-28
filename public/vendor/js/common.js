@@ -14,17 +14,19 @@ var addbid;
  }
  ]
  */
-function loadContracts() {
+function loadModalData(data) {
+    $("#modal").html("");
 
     $.ajax({
-        url: "http://localhost:3000/auctions/initial",
-        type: "GET",
-        data: "json",
+        url: "http://localhost:3000/bids/add",
+        type: "POST",
+        dataType: "json",
+        data : data,
         success:function (data,textStatus,jqXHR) {
-            contracts = jqXHR.responseJSON;
+            var bid = jqXHR.responseJSON;
 
-            $("#content").html("");
-            addbid.forEach(updateTabs);
+            bid.forEach(updateModal);
+            $("#myModal").modal();
         }
     })
 
@@ -32,15 +34,29 @@ function loadContracts() {
 
 
 
-function updateTabs(data) {
+function updateModal(data) {
 
-    $('#content').append(
+    $('#modal').append(
 
+            '<div class="col-sm-4"><font color="#703577" size="5" style="font-family:Tw Cen MT"><strong>'+data.item_name+'</strong></font><br>'+
+                '<strong><h4 style="color:red">Current Lowest Bid</h4></strong>'+
+                '<h3 style="color:green; size:13">'+data.bid+'</h3>'+
+                    '<div><strong>Update Your Bid</strong></div><br>'+
+                        '<div class="input-prepend input-append margin-2">'+
+                            '<div style="padding-left:0px">'+
+                                '<input class="margin-b0 margin-l0 input-mini earnedSum" name="Bid01" size="4" color="red" type="text" placeholder="XXXX$"><h15>$</h15>'+
+                            '</div>'+
+                        '</div>'+
+            '</div>'
 
     )
 }
 
 
-window.onload = function (d) {
-    loadContracts();
-};
+
+$(document).on('click','.add_bid-btn',function (d) {
+    var auid = this.parentNode.parentNode.firstChild.firstChild.childNodes[1].firstChild.firstChild.nodeValue;
+    var object = {"auction_id":auid};
+
+    loadModalData(object);
+});
