@@ -1,7 +1,7 @@
 //------------------global variables -------------------//
 var additemenabled = true;
 var itemid, itemname, itemdesc;
-var deluid;
+var deluid,p_data,table;
 
 
 //-------------------all btns---------------------------//
@@ -19,9 +19,28 @@ $("#add-item-btn").click(function (d){
 $(document).on('click','.editBtn',function(d){
     var iid = this.parentNode.parentNode.childNodes[0].innerHTML;
     additemenabled=false;
-    $("#itemid").prop('disabled',true);
-    $("#confirm-win-btn").text("Change");
-    $("#add-item-modal").modal();
+    var obj = {"item_id":iid};
+    //ajax
+    $.ajax({
+        url : "http://127.0.0.1:3000/items/edit",
+        type : "POST",
+        dataType :"json",
+        data : obj,
+        success:function(data,textStatus,jqXHR){
+            var response = jqXHR.responseJSON[0];
+            itemid = response.item_id;
+            itemname = response.item_name;
+            itemdesc = response.description;
+            setFormData();
+            
+            $("#itemid").prop('disabled',true);
+            $("#confirm-win-btn").text("Change");
+            $("#add-item-modal").modal();
+            
+        }
+    })
+    
+
 });
 
 //main Window - table -del
@@ -46,12 +65,19 @@ $("#win-add-item-btn").click(function (d){
 $("#win-conf-item-btn").click(function (d){
     //MAKE JSON
     //SEND BY AJAX
-    var obj = createJSON();
+    
     if(additemenabled){
         //post req
+        var obj = createJSON();
+        var path = "http://127.0.0.1:3000/items/add";
+        sendDatabyPost(path,obj,"New Item Added");
+        
     }
     else{
         //post req
+        var obj = createJSON();
+        var path = "http://127.0.0.1:3000/items/edit/confirm";
+        sendDatabyPost(path,obj,"Item status updated");
     }
 });
 
@@ -65,6 +91,18 @@ $("#conf-close-btn").click(function (d){
 // del confirm window - yes btn
 $("#del-item-cbtn").click(function(d) {
     //ajax to del
+    var json = {"item_id": deluid};
+    var path = "http://127.0.0.1:3000/items/del";
+    
+    $.ajax({
+        url : path,
+        dataType: 'json',
+        data : json,
+        type : "DELETE",
+        success:function(data,textStatus,jqXHR){
+             sendDatatoUpdate({},"http://127.0.0.1:3000/items/initial");
+        }
+    })
 })
 
 //del confirm window- no btn
@@ -92,9 +130,9 @@ function clearFormData(){
 
 //set data in form
 function setFormData(){
-    $("#itemid").text(itemid);
-    $("#itemname").text(itemname);
-    $("#item-desc").text(itemdesc);
+    $("#itemid").val(itemid);
+    $("#itemname").val(itemname);
+    $("#item-desc").val(itemdesc);
 }
 
 //set data for confirm win
@@ -128,32 +166,48 @@ function filterTable(obj){
     var tid = obj.item_id;
     var tiname = obj.item_name;
     var tidesc = obj.description;
-    
-    $("#table-body").append(
-        "<tr>"+
-            "<td>" + tid + "</td>"+
-            "<td>" + tiname +"</td>"+
-            "<td>" + tidesc+ "</td>"+
-            "<td>"+   
-                '<a class="delBtn btn btn-default btn-sm pull-right" href="#">'+
+    var btn =   '<a class="delBtn btn btn-default btn-sm pull-right" href="#">'+
                 '<i class="fa fa-trash fa-fw"></i> Delete</a>'+
                 '<a class="editBtn btn btn-default btn-sm pull-right" href="#">'+
-                '<i class="fa fa-pencil fa-fw"></i> Edit</a>'+
-            "</td>"+
-        "</tr>"
-    );
+                '<i class="fa fa-pencil fa-fw"></i> Edit</a>';
+    
+    var newObj = {
+        "item_id" : tid,
+        "item_name" : tiname,
+        "description" : tidesc,
+        "btn" : btn
+    }
+    p_data.data.push(newObj);
 }
+
+function tablerefresh(){
+    table = $("#item-table").DataTable({
+        "bPaginate":true,
+        "aaData":p_data.data,
+        "aoColumns":[
+            {"data":"item_id"},
+            {"data":"item_name"},
+            {"data":"description"},
+            {"data":"btn"}
+        ]
+    });
+}
+
 
 // ajax post msg
 function sendDatatoUpdate(jsonO,path,sucfunc,message){
     
     $.ajax({
         url : path,
-        type : 'POST',
+        type : 'GET',
         dataType : 'json',
         data : jsonO,
         success:function(data,textStatus,jqXHR){
-            loadtable(data);
+            var table_data = jqXHR.responseJSON;
+            p_data.data = [];
+            table_data.forEach(filterTable);
+            table.destroy();
+            tablerefresh();
         },
         fail:function(jqXHR,textStatus,errorThrown){
            
@@ -170,7 +224,7 @@ function sendDatabyPost(path,json,successmsg){
         dataType : 'json',
         data : json,
         success:function(data,textStatus,jqXHR){
-
+            sendDatatoUpdate({},'http://127.0.0.1:3000/items/initial');
         },
         fail:function(jqXHR,textStatus,errorThrown){
            
@@ -191,5 +245,7 @@ function loadtable(data){
 
 //--------------------onload------------------------------//
 window.onload = function(){
-    $('#item-table').DataTable();
+    p_data={"data":[]};
+    tablerefresh();
+    sendDatatoUpdate({},'http://127.0.0.1:3000/items/initial');
 }
