@@ -44,6 +44,8 @@ VENDOR_ID VARCHAR(20) NOT NULL,
 TIME TIME NOT NULL,
 BID_AMOUNT DECIMAL NOT NULL);
 
+CREATE SEQUENCE bid_id_seq;
+ALTER TABLE user ALTER bid_id SET DEFAULT NEXTVAL('user_id_seq');
 
 ALTER TABLE AUCTION
 ADD FOREIGN KEY (CREATED_BY) REFERENCES USERS;
@@ -72,3 +74,32 @@ INSERT INTO auction(auction_id, description, name, due_date, start_time, end_tim
  values('AUC001', 'Auction for buying fabrics', 'Fabric', '2017-01-01', '20:00:00', '21:00:00', '2016-12-20', 'mas_admin');
 INSERT INTO auction(auction_id, description, name, due_date, start_time, end_time, date_created, created_by)
  values('AUC002', 'Auction for buying Metal', 'Metal', '2017-01-05', '20:00:00', '21:00:00', '2016-05-3', 'mas_admin');
+
+INSERT INTO bid(auction_id, item_id, vendor_id, time, bid_amount)
+ values('AUC001', 'FAB001', 'VEN001', '24:00:00', 150);
+INSERT INTO bid(auction_id, item_id, vendor_id, time, bid_amount)
+ values('AUC001', 'FAB001', 'VEN001', '24:00:00', 120);
+INSERT INTO bid(auction_id, item_id, vendor_id, time, bid_amount)
+ values('AUC001', 'FAB002', 'VEN001', '24:00:00', 230);
+INSERT INTO bid(auction_id, item_id, vendor_id, time, bid_amount)
+ values('AUC001', 'FAB002', 'VEN001', '24:00:00', 200);
+INSERT INTO bid(auction_id, item_id, vendor_id, time, bid_amount)
+ values('AUC001', 'FAB003', 'VEN001', '24:00:00', 320);
+INSERT INTO bid(auction_id, item_id, vendor_id, time, bid_amount)
+ values('AUC001', 'FAB003', 'VEN001', '24:00:00', 310);
+
+SELECT item_id, MIN(bid_amount) FROM bid WHERE auction_id='AUC001' GROUP BY item_id;
+
+SELECT DISTINCT ON (item_id) item_id, MIN(bid_amount) OVER (PARTITION BY item_id) AS min_amount FROM bid WHERE auction_id='AUC001';
+
+
+
+
+
+
+
+
+
+
+
+

@@ -10,7 +10,6 @@ router.get('/', function(req, res, next) {
     res.send('auctions');
 });
 
-
 router.get('/initial', function(req, res, next) {
     const results = [];
 
@@ -22,7 +21,7 @@ router.get('/initial', function(req, res, next) {
             return res.status(500).json({success: false, data: err});
         }
         // SQL Query > Insert Data
-        const query = client.query("SELECT * FROM auctions");
+        const query = client.query("SELECT * FROM auction");
 
         // Stream results back one row at a time
         query.on('row', function(row) {
@@ -62,10 +61,14 @@ router.post('/new', function(req, res, next) {
             return res.status(500).json({success: false, data: err});
         }
 
+        var date = new Date();
+        var curr_date = date.getFullYear() +'-'+ date.getMonth() +'-'+ date.getDate();
+
         // SQL Query > Insert Data
         const query = client.query("INSERT INTO auction(auction_id, description, name, due_date, start_time, end_time, date_created, created_by) " +
             "values($1, $2, $3, $4, $5, $6, $7, $8)",
-            [data.auc_id, data.descrip, data.name, data.due_date, data.s_time, data.e_time, '2017-02-25', data.cr_user]);
+            [data.auc_id, data.descrip, data.name, data.due_date, data.s_time, data.e_time, curr_date, data.cr_user]);
+
         data.vendors.forEach(function (vendor) {
             client.query("INSERT INTO auction_vendors (auction_id, vendor_id) values ($1, $2)", [data.auc_id, vendor]);
         });
@@ -89,13 +92,15 @@ router.post('/new', function(req, res, next) {
 });
 
 router.post('/edit', function(req, res, next) {
-    const results = [];
+    const auc_data = [];
+    const items = [];
+    const  vendors = [];
+
     // Get a Postgres client from the connection pool
     const data = {
-        auid: req.body.auction_id,
-
+        auc_id: req.body.auction_id
     };
-    console.log(req.body);
+
     pg.connect(connectionString, function(err, client, done) {
         // Handle connection errors
         if(err) {
@@ -104,11 +109,33 @@ router.post('/edit', function(req, res, next) {
             return res.status(500).json({success: false, data: err});
         }
         // SQL Query > Select Data
-        const query = client.query("SELECT * FROM auction WHERE auction_id=($1)", [data.auid]);
-        // Stream results back one row at a time
+        var query = client.query("SELECT * FROM auction WHERE auction_id=($1)", [data.auc_id]);
         query.on('row', function(row) {
-            results.push(row);
+            auc_data.push(row);
         });
+
+        query = client.query("SELECT * FROM auction_vendors WHERE auction_id=($1)", [data.auc_id]);
+        query.on('row', function(row) {
+            vendors.push(row);
+        });
+
+        query = client.query("SELECT * FROM auction_items WHERE auction_id=($1)", [data.auc_id]);
+        query.on('row', function(row) {
+            items.push(row);
+        });
+
+        var results = {
+            decrip: auc_data.description,
+            name: auc_data.name,
+            due_date: auc_data.due_date,
+            start_time: auc_data.start_time,
+            end_time: auc_data.end_time,
+            date_created: auc_data.date_created,
+            created_by: auc_data.created_by,
+            vendors: vendors,
+            items: items
+        };
+
         // After all data is returned, close connection and return results
         query.on('end', function() {
             done();
@@ -200,8 +227,7 @@ router.get('/search', function(req, res, next) {
             return res.status(500).json({success: false, data: err});
         }
         // SQL Query > Insert Data
-        const query = client.query("INSERT INTO auction(auction_id, description, name, due_date, start_time, end_time, date_created, created_by) values($1, $2, $3, $4, $5, $6, $7, $8)",
-            [data.auc_id, data.descrip, data.name, data.due_date, data.s_time, data.e_time, data.date_cr, data.cr_user]);
+        const query = client.query("SELECT * FROM auction");
         // Stream results back one row at a time
         query.on('row', function(row) {
             results.push(row);
@@ -214,7 +240,6 @@ router.get('/search', function(req, res, next) {
         });
     });
 });
-
 
 router.get('/initial', function(req, res, next) {
     const results = [];

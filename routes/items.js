@@ -123,7 +123,6 @@ router.get('/initial', function(req, res, next) {
     });
 });
 
-
 router.put('/edit/confirm', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
@@ -214,7 +213,6 @@ router.get('/search', function(req, res, next) {
     });
 });
 
-
 router.get('/itemlist', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
@@ -236,7 +234,7 @@ router.get('/itemlist', function(req, res, next) {
         query.on('end', function() {
             done();
             // console.log(results);
-            return res.send(results);
+            return res.json(results);
         });
     });
 });
