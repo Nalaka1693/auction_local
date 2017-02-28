@@ -113,7 +113,7 @@ router.post('/edit', function(req, res, next) {
     });
 });
 
-router.post('/initial', function(req, res, next) {
+router.get('/initial', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
     pg.connect(connectionString, function(err, client, done) {
@@ -125,6 +125,30 @@ router.post('/initial', function(req, res, next) {
         }
         // SQL Query > Select Data
         const query = client.query("SELECT * FROM users");
+        // Stream results back one row at a time
+        query.on('row', function(row) {
+            results.push(row);
+        });
+        // After all data is returned, close connection and return results
+        query.on('end', function() {
+            done();
+            return res.json(results);
+        });
+    });
+})
+
+router.get('/vendorlist', function(req, res, next) {
+    const results = [];
+    // Get a Postgres client from the connection pool
+    pg.connect(connectionString, function(err, client, done) {
+        // Handle connection errors
+        if(err) {
+            done();
+            console.log(err);
+            return res.status(500).json({success: false, data: err});
+        }
+        // SQL Query > Select Data
+        const query = client.query("SELECT user_id,fname,lname FROM users WHERE role='Vendor'");
         // Stream results back one row at a time
         query.on('row', function(row) {
             results.push(row);

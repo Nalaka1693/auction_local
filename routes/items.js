@@ -42,7 +42,7 @@ router.post('/add', function(req, res, next) {
         name: req.body.item_name,
         decsrip: req.body.description
     };
-
+    console.log(data);
     pg.connect(connectionString, function(err, client, done) {
         // Handle connection errors
         if(err) {
@@ -50,9 +50,11 @@ router.post('/add', function(req, res, next) {
             console.log(err);
             return res.status(500).json({success: false, data: err});
         }
+        console.log(data.decsrip);
         // SQL Query > Select Data
         const query = client.query("INSERT INTO items(item_id, item_name, description) values($1, $2, $3)",
             [data.i_id, data.name, data.descrip]);
+
         // Stream results back one row at a time
         query.on('row', function(row) {
             results.push(row);
@@ -84,6 +86,31 @@ router.post('/edit', function(req, res, next) {
         }
         // SQL Query > Select Data
         const query = client.query("SELECT * FROM items WHERE item_id=($1)", [data.i_id]);
+        // Stream results back one row at a time
+        query.on('row', function(row) {
+            results.push(row);
+        });
+        // After all data is returned, close connection and return results
+        query.on('end', function() {
+            done();
+            return res.json(results);
+        });
+    });
+});
+
+router.get('/initial', function(req, res, next) {
+    const results = [];
+    // Get a Postgres client from the connection pool
+
+    pg.connect(connectionString, function(err, client, done) {
+        // Handle connection errors
+        if(err) {
+            done();
+            console.log(err);
+            return res.status(500).json({success: false, data: err});
+        }
+        // SQL Query > Select Data
+        const query = client.query("SELECT * FROM items");
         // Stream results back one row at a time
         query.on('row', function(row) {
             results.push(row);
@@ -185,5 +212,33 @@ router.get('/search', function(req, res, next) {
         });
     });
 });
+
+
+router.get('/itemlist', function(req, res, next) {
+    const results = [];
+    // Get a Postgres client from the connection pool
+
+    pg.connect(connectionString, function(err, client, done) {
+        // Handle connection errors
+        if(err) {
+            done();
+            console.log(err);
+            return res.status(500).json({success: false, data: err});
+        }
+        // SQL Query > Select Data
+        const query = client.query("SELECT item_id, item_name FROM items");
+        // Stream results back one row at a time
+        query.on('row', function(row) {
+            results.push(row);
+        });
+        // After all data is returned, close connection and return results
+        query.on('end', function() {
+            done();
+            // console.log(results);
+            return res.send(results);
+        });
+    });
+});
+
 
 module.exports = router;
