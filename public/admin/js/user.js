@@ -1,24 +1,27 @@
 //---------------gloabal variables-----------------//
 
 var userID, fname, lname, role, email, password, compassword, company, telephone,datec;
-var deluid, hiderow;
+var deluid, hiderowl;
+var table_data,p_data,table;
 var adduserenabled = true;
 var newobj = {
  'data':
     [
         {
             'user_id' : '1234568',
-            'fname' : 'deshan',
-            'lname' : 'kalupahana',
+            'name' : 'deshan kalupahana',
             'role' : 'admin',
-            'company' : 'abc'
+            'company' : 'abc',
+            'date_created': '2017.01.02',
+            'btn' :""
         },
         {
-            'user_id' : '5886552',
-            'fname' : 'john',
-            'lname' : 'doe',
+            'user_id' : '1234568',
+            'name' : 'deshan kalupahana',
             'role' : 'admin',
-            'company' : 'opsl'
+            'company' : 'abc',
+            'date_created': '2017.01.02',
+            'btn' :""
         }
     ]
 }
@@ -57,14 +60,14 @@ function clearForm(){
 
 //set form data
 function setAddForm(){
-    $("#userid").text(userID);
-    $("#fname").text(fname);
-    $("#lname").text(lname);
-    $("#email").text(email);
-    $("#userpw").text(password);
-    $("#userpwcon").text(password);
-    $("#company").text(company);
-    $("#telephone").text(telephone);
+    $("#userid").val(userID);
+    $("#fname").val(fname);
+    $("#lname").val(lname);
+    $("#email").val(email);
+    $("#userpw").val(password);
+    $("#userpwcon").val(password);
+    $("#company").val(company);
+    $("#telephone").val(telephone);
    
 }
 
@@ -129,7 +132,7 @@ $("#confirm-user-btn").click(function (d){
     else{
         //update user db req
         var obj = createJSON();
-        var path = "http://127.0.0.1:3000/users/edit"; //give path
+        var path = "http://127.0.0.1:3000/users/edit/confirm"; //give path
         sendDatabyPost(path,obj,"User statys updated");
     }
     clearForm();
@@ -144,26 +147,28 @@ $(document).on('click','.editBtn',function (d){
     adduserenabled=false;
     //update form
     $.ajax({
-        url : "http://127.0.0.1:3000/loadEdit",
-        type : "POST",
+        url : "http://127.0.0.1:3000/users/edit",
+        type : 'POST',
+        dataType: "json",
         data : obj,
         success : function(data,textStatus,jqXHR){
-            userID = data.user_id;
-            fname = data.fname;
-            lname = data.lname;
-            role = data.role;
-            email = data.email;
-            company = data.company;
-            password = data.password;
-            compassword = data.password;
-            telephone = data.mobile;
+            var response = jqXHR.responseJSON[0];
+            userID = response.user_id;
+            fname = response.fname;
+            lname = response.lname;
+            role = response.role;
+            email = response.email;
+            company = response.company;
+            password = response.password;
+            compassword = response.password;
+            telephone = response.mobile;
+            setAddForm();
+            $("#userid").prop('disabled',true);
+            $("#add-btn-label").text("Change");
+            $("#add-user-modal").modal();
+    
         }
     });
-    
-    setAddForm()
-    $("#userid").prop('disabled',true);
-    $("#add-btn-label").text("Change");
-    $("#add-user-modal").modal();
     
 });
 
@@ -182,8 +187,16 @@ $(document).on('click','.delBtn',function (d){
 // Del confirm window - yes
 $("#del-user-btn").click(function(d) {
     var json = { "user_id" : deluid };
-    var path = "http://127.0.0.1:3000"; //give path
-    sendDatabyPost(path,json,"User Removed from the System");
+    var path = "http://127.0.0.1:3000/users/del"; //give path
+    $.ajax({
+        url : path,
+        dataType: "json",
+        data : json,
+        type : "DELETE",
+        success:function(data,textStatus,jqXHR){
+            sendDatatoUpdate({},"http://127.0.0.1:3000/users/initial");
+        }
+    })
 });
 
 //del confirm window - no
@@ -224,11 +237,14 @@ function sendDatatoUpdate(jsonO,path,sucfunc,message){
     
     $.ajax({
         url : path,
-        type : 'POST',
+        type : 'GET',
         dataType : 'json',
         data : jsonO,
         success:function(data,textStatus,jqXHR){
-            loadtable(data);
+            table_data = jqXHR.responseJSON;
+            processJSON(table_data);
+            table.destroy();
+            tablerefresh();
         },
         fail:function(jqXHR,textStatus,errorThrown){
            
@@ -245,7 +261,7 @@ function sendDatabyPost(path,json,successmsg){
         dataType : 'json',
         data : json,
         success:function(data,textStatus,jqXHR){
-
+            sendDatatoUpdate({},'http://127.0.0.1:3000/users/initial');
         },
         fail:function(jqXHR,textStatus,errorThrown){
            
@@ -266,38 +282,51 @@ function showNotific(message){
 function filterTable(obj){
     var uid = obj.user_id;
     var tfname = obj.fname;
-    var tlname = obj.lname;
+    var tlname = obj.lname;             
     var trole = obj.role;
     var tcompany = obj.company;
-    var tdatecreated = obj.date_created;
-    
-    $("#table-body").append(
-        "<tr>"+
-            "<td>" + uid + "</td>"+
-            "<td>" + tfname + " " + tlname +"</td>"+
-            "<td>" + trole + "</td>"+
-            "<td>" + tcompany + "</td>"+
-            "<td>" + tdatecreated + "</td>" +
-            "<td>"+    
-                '<a class="delBtn btn btn-default btn-sm pull-right" href="#">'+
+    var tdatecreated = obj.date_created;    
+    var btn =   '<a class="delBtn btn btn-default btn-sm pull-right" href="#">'+
                 '<i class="fa fa-trash fa-fw"></i> Delete</a>'+
                 '<a class="editBtn btn btn-default btn-sm pull-right" href="#">'+
-                '<i class="fa fa-pencil fa-fw"></i> Edit</a>'+
-            "</td>"+
-        "</tr>"
-    );
+                '<i class="fa fa-pencil fa-fw"></i> Edit</a>';
+    var newObj = {
+        "user_id" : uid,
+        "name" : tfname + " " +tlname,
+        "role" : trole,
+        "company" : tcompany,
+        "date_created" : tdatecreated.substring(0,10),
+        "btn" : btn
+    }
+    p_data.data.push(newObj);
+ 
 }
 
-function init(){
-    //sendDatatoUpdate("",);
+function tablerefresh(){
+ 
+        table = $('#users-table').DataTable({
+            "bPaginate": true,
+            "aaData": p_data.data,
+            "aoColumns": [
+                {"data":"user_id"},
+                {"data":"name"},
+                {"data":"role"},
+                {"data":"company"},
+                {"data":"date_created"},
+                {"data":"btn"}
+            ] 
+        });
+    
+
 }
 //-------------------Table loading -------------------------//
 
 
 //for refresh page by search
-function loadtable(data){
+function processJSON(datao){
     $("#table-body").html("");
-    datao.data.forEach(filterTable);
+    p_data = {"data":[]};
+    datao.forEach(filterTable);
 }
 
 
@@ -305,16 +334,21 @@ function loadtable(data){
 
 
 
+
 //-----------------------onload---------------------------//
 window.onload = function(){
     
     $("#search-date-input").datepicker();
-    
-    
-    //table format
-   $(document).ready(function() {
-        // DataTable
-        var table = $('#users-table').DataTable();
-   });
+    p_data = {"data":[]};
+    tablerefresh();
 
-};
+
+}
+
+//table format
+$(document).ready(function() {
+    // DataTable
+    sendDatatoUpdate({},'http://127.0.0.1:3000/users/initial');
+});
+
+

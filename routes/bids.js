@@ -10,7 +10,7 @@ router.get('/', function(req, res, next) {
     res.send('bids');
 });
 
-router.post('/add ', function(req, res, next) {
+router.post('/add2 ', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
     const data = {
@@ -47,6 +47,5 @@ router.post('/add ', function(req, res, next) {
         });
     });
 });
-
 
 module.exports = router;

@@ -1,7 +1,10 @@
 //----------------global variales --------------------//
-var aucid, aucdesc, aucname, duedate, stime, etime, cdate, cuser,vendors,items;
-var s_aucid, s_aucname, s_sdate, s_edate, deluid;
+var aucid, aucdesc, aucname, duedate, stime, etime, cdate,user, vendors,items;
+var s_aucid, s_aucname, s_sdate, s_edate, deluid,table;
 var newaucenabled=true;
+var n_items,n_items;
+var p_data,table;
+
 
 
 
@@ -9,6 +12,8 @@ var newaucenabled=true;
 
 // main window -  new auction btn
 $("#new-auc-add-btn").click(function(d){
+	vendors=[];
+	items =[];
     newaucenabled = true;
     clearDataAddForm();
     $("#aucid").prop('disabled',false);
@@ -19,14 +24,62 @@ $("#new-auc-add-btn").click(function(d){
 
 // Main Window - Table - Edit Btn
 $(document).on('click','.editBtn',function (d){
-    var uid = this.parentNode.parentNode.childNodes[0].innerHTML;
+    var aid = this.parentNode.parentNode.childNodes[0].innerHTML;
     newaucenabled=false;
+	var obj = {"auction_id":aid};
     //update form
+	$.ajax({
+		url : "http://127.0.0.1:3000/auctions/edit",
+		type : "POST",
+		dataType : "json",
+		data : obj,
+		success: function(data, textStatus,jqXHR){
+			var response = jqXHR.responseJSON;
+			aucid = response.auction_id;
+			aucname = response.name;
+			aucdesc = response.description;
+			duedate = response.due_date;
+			stime = response.start_time;
+			etime = response.end_time;
+			vendors = response.vendors;
+			items = response.items;
+			vendors.forEach(function(data){
+				$.ajax({
+					url:"http://127.0.0.1:3000/users/vendor",
+					type: "POST",
+					dataType: "json",
+					data : {"user_id":data},
+					success:function(data,textStatus,jqXHR){
+						var res = res.responseJSON;
+						var nobj = {"name":res.fname+" "+res.lname+"-"+res.user_id};
+						n_vendors.push(nobj);
+					}
+				})
+			});
+			items.forEach(function(data){
+				$.ajax({
+					url:"http://127.0.0.1:3000/items/iteml",
+					type: "POST",
+					dataType: "json",
+					data : {"item_id":data},
+					success:function(data,textStatus,jqXHR){
+						var res = res.responseJSON;
+						var nobj = {"name":res.item_name+"-"+res.item_id};
+						n_items.push(nobj);
+					}
+				})
+			});
+			setDataAddForm();
+			$("#aucid").prop('disabled',true);
+			$("#add-auc-window-au-btn").text("Change");
+			$("#new-auction-modal").modal();
+			
+		}
+		
+	})
+	
     
-    setDataAddForm();
-    $("#aucid").prop('disabled',true);
-    $("#add-auc-window-au-btn").text("Change");
-    $("#new-auction-modal").modal();
+
     
 });
 
@@ -48,11 +101,7 @@ $("#search-btn").click(function(d) {
     if(!checkEmpty(s_sdate) && !checkEmpty(s_edate)){
         //serch
         var obj = {"start_date":s_sdate, "end_date":s_edate };
-    }
-    
-    
-    
-    
+    } 
 });
 
 //add auc window - confirm
@@ -63,6 +112,25 @@ $("#win-add-auc-btn").click(function (d){
     
 });
 
+//add confirm window - confirm
+$("#win-conf-auc-btn").click(function (d){
+	if(newaucenabled){
+		var obj= createJSON();
+		var path = "http://127.0.0.1:3000/auctions/new";
+		sendDatabyPost(path,obj,"New Auction Added");
+	}
+	else{
+		var obj = createJSON();
+		var path = "http://127.0.0.1:3000/auctions/edit/confirm";
+		sendDatabyPost(path,obj,"Auction Status Changed");
+	}
+});
+
+//add confirm window- close
+$("#conf-close-btn").click(function (d){
+	setDataAddForm();
+	$("#new-auction-modal").modal();
+});
 
 // del confirm window - yes btn
 $("#del-auc-cbtn").click(function(d) {
@@ -86,9 +154,16 @@ function getDataAddForm(){
     duedate = $("#due-date").val();
     stime = $("#start-time").val();
     etime = $("#end-time").val();
-    vendors = $("#ven-list").val().split(",");
-    items = $("#item-list").val().split(",");
+    n_vendors = $("#ven-list").val().split(",");
+    n_items = $("#item-list").val().split(",");
     
+	n_vendors.forEach(function(data){
+		vendors.push(data.split("-")[1]);
+	});
+	
+	n_items.forEach(function(data){
+		items.push(data.split("-")[1]);
+	});
     
 }
 
@@ -102,6 +177,8 @@ function clearDataAddForm(){
     $("#end-time").val("");
     $("#ven-list").val("");
     $("#item-list").val("");
+	$('#ven-list').tagsinput('removeAll');
+	$('#item-list').tagsinput('removeAll');
 }
 
 
@@ -114,8 +191,8 @@ function setDataAddForm(){
     $("#due-date").val(duedate);
     $("#start-time").val(stime);
     $("#end-time").val(etime);
-    vendors.forEach(setDataOnEditVendor);
-    items.forEach(setDataOnEditItems);
+    n_vendors.forEach(setDataOnEditVendor);
+    n_items.forEach(setDataOnEditItems);
 
 
 }
@@ -136,6 +213,8 @@ function setDataOnConf(){
     $("#duedate-label").text(duedate);
     $("#stime-label").text(stime);
     $("#etime-label").text(etime);
+	$("#venlist-label").text(n_vendors.toString());
+	$("#itemlist-label").text(n_items.toString());
 }
 
 
@@ -146,53 +225,6 @@ function getDatafromSearch(){
     s_sdate = $("#search-auc-sdate").val();
     s_edate = $("#search-auc-edate").val();
 }
-
-
-//------------------tags----------------------------//
-//
-
-var vendorn = new Bloodhound({
-    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    local : [{id:"02156", name:"lenovo"},{id:"265456",name:"havelet"},{id:"2564",name:"dellops"}]
-});
-
-var itemlist = new Bloodhound({
-    datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
-    queryTokenizer: Bloodhound.tokenizers.whitespace,
-    local : [{id:"02156", name:"fabric"},{id:"265456",name:"ribbon"},{id:"2564",name:"buttons"}]
-});
-
-vendorn.initialize();
-itemlist.initialize();
-
-$('#ven-list').tagsinput({
-    typeaheadjs:{
-        name:'vendorn',
-        displayKey:'name',
-        valueKey:'id',
-        source:vendorn.ttAdapter()
-    },
-    freeInput:true,
-    allowDuplicates:false,
-    onTagExists: function(item, $tag) {
-        $tag.hide().fadeIn();
-    }
-});
-
-$('#item-list').tagsinput({
-    typeaheadjs:{
-        name:'itemlist',
-        displayKey:'name',
-        valueKey:'id',
-        source:itemlist.ttAdapter()
-    },
-    freeInput:true,
-    allowDuplicates:false,
-    onTagExists: function(item, $tag) {
-        $tag.hide().fadeIn();
-    }
-});
 
 //--------------------sup -------------------------//
 function checkEmpty(a){
@@ -207,8 +239,9 @@ function createJSON(){
         due_date : duedate,
         start_time : stime,
         end_time : etime,
-        vendor : vendors,
-        item : items
+        vendors : vendors,
+        items : items,
+		created_by: user
     }
     return json;
 }
@@ -216,23 +249,34 @@ function createJSON(){
 
 // table populate
 function filterTable(obj){
-    var tid = obj.item_id;
-    var tiname = obj.item_name;
-    var tidesc = obj.description;
-    
-    $("#table-body").append(
-        "<tr>"+
-            "<td>" + aucid + "</td>"+
-            "<td>" + aucname +"</td>"+
-            "<td>" + duedate+ "</td>"+
-            "<td>"+    
-                '<a class="delBtn btn btn-default btn-sm pull-right" href="#">'+
-                '<i class="fa fa-trash fa-fw"></i> Delete</a>'+
+    var tid = obj.auction_id;
+    var tiname = obj.name;
+    var due_date = obj.due_date.substring(0,10);
+	var btn = '<a class="delBtn btn btn-default btn-sm pull-right" href="#">'+
+                '<i class="fa fa-trash fa-fw"></i> </a>'+
                 '<a class="editBtn btn btn-default btn-sm pull-right" href="#">'+
-                '<i class="fa fa-pencil fa-fw"></i> Edit</a>'+
-            "</td>"+
-        "</tr>"
-    );
+                '<i class="fa fa-pencil fa-fw"></i></a>';
+    var newobj = {
+		"auction_id":tid,
+		"name": tiname,
+		"due_date": due_date,
+		"btn": btn
+	}
+	p_data.data.push(newobj);
+}
+
+
+function tablerefresh(){
+	table = $("#auc-table").DataTable({
+		"bPaginate":true,
+		"aaData":p_data.data,
+		"aoColumns":[
+			{"data":"auction_id"},
+			{"data":"name"},
+			{"data":"due_date"},
+			{"data":"btn"}
+		]
+	});
 }
 
 // ajax post msg
@@ -240,11 +284,15 @@ function sendDatatoUpdate(jsonO,path,sucfunc,message){
     
     $.ajax({
         url : path,
-        type : 'POST',
+        type : 'GET',
         dataType : 'json',
         data : jsonO,
         success:function(data,textStatus,jqXHR){
-            loadtable(data);
+            var table_data = jqXHR.responseJSON;
+			p_data.data = [];
+			table_data.forEach(filterTable);
+			table.destroy();
+			tablerefresh();
         },
         fail:function(jqXHR,textStatus,errorThrown){
            
@@ -261,13 +309,14 @@ function sendDatabyPost(path,json,successmsg){
         dataType : 'json',
         data : json,
         success:function(data,textStatus,jqXHR){
-
+			sendDatatoUpdate({},"http://127.0.0.1:3000/auctions/initial");
         },
         fail:function(jqXHR,textStatus,errorThrown){
            
         }
     });
 }
+
 
 
 //-------------------table load -----------------------//
@@ -281,7 +330,87 @@ function loadtable(data){
 
 //---------------intial----------------------------//
 window.onload = function(){
+	item_list=[];
+	vendor_list =[];
+	p_data={"data":[]};
     $("#search-auc-sdate").datepicker();
     $("#search-auc-edate").datepicker();
-    $("#auc-table").DataTable();
+	$("#due-date").datepicker();
+//	$("#start-time").timepicker();
+//	$("#end-time").timepicker();
+	tablerefresh();
+	sendDatatoUpdate({},"http://127.0.0.1:3000/auctions/initial");
+     
+    
 }
+
+$(document).ready(function (d){
+
+	user = 'mas_admin';
+	
+
+	//------------------tags----------------------------//
+	//
+
+
+	var vendorn = new Bloodhound({
+		datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+		queryTokenizer: Bloodhound.tokenizers.whitespace,
+		prefetch : {
+			url : "http://127.0.0.1:3000/users/vendorlist",
+			filter : function(data){
+				return $.map(data,function(vennames){
+					return { 'name' : vennames.fname+" "+vennames.lname+"-"+vennames.user_id }
+				});
+			}
+		}
+
+	});
+
+
+	var itemlist = new Bloodhound({
+		datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+		queryTokenizer: Bloodhound.tokenizers.whitespace,
+		prefetch : {
+			url : "http://127.0.0.1:3000/items/itemlist",
+			filter : function(data){
+				return $.map(data,function(items){
+					return {'name': items.item_name+"-"+items.item_id}
+				});
+			}
+		}
+	});
+
+	vendorn.initialize();
+	itemlist.initialize();
+
+	$('#ven-list').tagsinput({
+		typeaheadjs:{
+			name:'vendorn',
+			displayKey:'name',
+			valueKey:'id',
+			source:vendorn.ttAdapter()
+		},
+		freeInput:true,
+		allowDuplicates:false,
+		onTagExists: function(item, $tag) {
+			$tag.hide().fadeIn();
+		}
+	});
+
+	$('#item-list').tagsinput({
+		typeaheadjs:{
+			name:'itemlist',
+			displayKey:'name',
+			valueKey:'id',
+			source:itemlist.ttAdapter()
+		},
+		freeInput:true,
+		allowDuplicates:false,
+		onTagExists: function(item, $tag) {
+			$tag.hide().fadeIn();
+		}
+	});
+
+	
+})

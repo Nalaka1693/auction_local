@@ -4,9 +4,8 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-var Promise = require('es6-promise').Promise;
 var cors = require('cors');
-
+var Promise = require('es6-promise').Promise;
 
 var bids = require('./routes/bids');
 var index = require('./routes/index');
@@ -30,7 +29,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'routes')));
 app.use(cors());
-app.options('*', cors());
+app.all('*',function (req,res,next) {
+    res.header("Access-Control-Allow-Origin",'*');
+    res.header("Access-Control-Allow-Headers","X-Requested-With");
+    res.header("Access-Control-Allow-Headers",'ContentType');
+    next();
+}) ;
 
 
 app.use('/', login);
