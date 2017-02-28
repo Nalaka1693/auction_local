@@ -10,7 +10,7 @@ router.get('/', function(req, res, next) {
     res.send('items');
 });
 
-router.post('/initial', function(req, res, next) {
+router.get('/initial', function(req, res, next) {
     const results = [];
 
     pg.connect(connectionString, function(err, client, done) {
