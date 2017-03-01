@@ -182,6 +182,7 @@ router.delete('/del', function(req, res, next) {
     });
 });
 
+
 router.get('/search', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool

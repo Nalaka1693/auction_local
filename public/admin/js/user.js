@@ -83,6 +83,14 @@ function setForm(){
 }
 
 
+//add data view form
+function setViewForm(){
+    $("#userId-view").text(userID);
+    $("#full-name-view").text(fname+" "+lname);
+    $("#role-view").text(role);
+    $("#email-view").text(email);
+    $("#telephone-view").text(telephone);
+}
 
 //-----------------------all btns------------------//
 
@@ -316,8 +324,31 @@ function tablerefresh(){
                 {"data":"btn"}
             ] 
         });
-    
+    	$("#users-table tr td:first-child").css('cursor', 'pointer');
+		$('#users-table').on('click', 'tr td:first-child', function () {
+        	var data = table.row( this ).data();
+			var obj = {"user_id":data.user_id};
+			//send ajax
+			$.ajax({
+				url : "http://127.0.0.1:3000/users/edit",
+				type : 'POST',
+				dataType: "json",
+				data : obj,
+				success : function(data,textStatus,jqXHR){
+					var response = jqXHR.responseJSON[0];
+					userID = response.user_id;
+					fname = response.fname;
+					lname = response.lname;
+					role = response.role;
+					email = response.email;
+					company = response.company;
+					telephone = response.mobile;
+					setViewForm();
+					$("#view-user-modal").modal();
 
+				}
+			});
+    	} );
 }
 //-------------------Table loading -------------------------//
 
