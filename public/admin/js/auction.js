@@ -2,7 +2,7 @@
 var aucid, aucdesc, aucname, duedate, stime, etime, cdate,user, vendors,items;
 var s_aucid, s_aucname, s_sdate, s_edate, deluid,table;
 var newaucenabled=true;
-var n_items,n_items;
+var n_vendors,n_items;
 var p_data,table;
 
 
@@ -24,6 +24,8 @@ $("#new-auc-add-btn").click(function(d){
 
 // Main Window - Table - Edit Btn
 $(document).on('click','.editBtn',function (d){
+	n_vendors=[];
+	n_items=[];
     var aid = this.parentNode.parentNode.childNodes[0].innerHTML;
     newaucenabled=false;
 	var obj = {"auction_id":aid};
@@ -35,39 +37,19 @@ $(document).on('click','.editBtn',function (d){
 		data : obj,
 		success: function(data, textStatus,jqXHR){
 			var response = jqXHR.responseJSON;
-			aucid = response.auction_id;
-			aucname = response.name;
-			aucdesc = response.description;
-			duedate = response.due_date;
-			stime = response.start_time;
-			etime = response.end_time;
-			vendors = response.vendors;
-			items = response.items;
+			aucid = response[2].auction_id;
+			aucname = response[2].name;
+			aucdesc = response[2].description;
+			duedate = response[2].due_date;
+			stime = response[2].start_time;
+			etime = response[2].end_time;
+			vendors = response[0].vendors;
+			items = response[1].items;
 			vendors.forEach(function(data){
-				$.ajax({
-					url:"http://127.0.0.1:3000/users/vendor",
-					type: "POST",
-					dataType: "json",
-					data : {"user_id":data},
-					success:function(data,textStatus,jqXHR){
-						var res = res.responseJSON;
-						var nobj = {"name":res.fname+" "+res.lname+"-"+res.user_id};
-						n_vendors.push(nobj);
-					}
-				})
+				
 			});
 			items.forEach(function(data){
-				$.ajax({
-					url:"http://127.0.0.1:3000/items/iteml",
-					type: "POST",
-					dataType: "json",
-					data : {"item_id":data},
-					success:function(data,textStatus,jqXHR){
-						var res = res.responseJSON;
-						var nobj = {"name":res.item_name+"-"+res.item_id};
-						n_items.push(nobj);
-					}
-				})
+				
 			});
 			setDataAddForm();
 			$("#aucid").prop('disabled',true);
@@ -93,6 +75,23 @@ $(document).on('click','.delBtn',function (d){
     $("#del-auction-confirm-modal").modal();
     //add code to give confirmation to delete
 });
+
+// Main WIndow ongoing panel
+$(document).on('click','.ongoing-btn',function(d){
+	var uid = this.lastElementChild.innerHTML;
+	var obj = {"auction_id":uid};
+	$.ajax({
+		url: "http://127.0.0.1:3000/auctions/ongoing",
+		data: obj,
+		dataType: 'json',
+		type: 'post',
+		success:function(data,textStatus,jqXHR){
+			var res = jqXHR.responseJSON;
+			//open modal
+		}
+	})
+});
+
 
 // Main window - search btn
 $("#search-btn").click(function(d) {
@@ -231,6 +230,26 @@ function checkEmpty(a){
     return a.length===0;
 }
 
+//get time diff
+function diff(start, end) {
+    start = start.split(":");
+    end = end.split(":");
+    var startDate = new Date(0, 0, 0, start[0], start[1], 0);
+    var endDate = new Date(0, 0, 0, end[0], end[1], 0);
+    var diff = endDate.getTime() - startDate.getTime();
+    var hours = Math.floor(diff / 1000 / 60 / 60);
+    diff -= hours * 1000 * 60 * 60;
+    var minutes = Math.floor(diff / 1000 / 60);
+
+    // If using time pickers with 24 hours format, add the below line get exact hours
+    if (hours < 0)
+       hours = hours + 24;
+
+    return (hours <= 9 ? "0" : "") + hours + ":" + (minutes <= 9 ? "0" : "") + minutes;
+}
+
+
+
 function createJSON(){
     var json = {
         auction_id : aucid,
@@ -263,6 +282,23 @@ function filterTable(obj){
 		"btn": btn
 	}
 	p_data.data.push(newobj);
+}
+
+//update ongoing auctions
+function filterOngoingPanel(obj){
+	var tid = obj.auction_id;
+	var tiname = obj.name;
+	var tstime = obj.start_time;
+	var date = new Date();
+	var current_hour = date.getHours()+":"+date.getMinutes();
+	var batch = diff(tstime,current_hour);
+	
+	$("#current-auctions").append(
+		'<a href="#" class="list-group-item ongoing-btn">'+
+        '<span class="badge">'+batch+' ago</span>'+
+        '<i class="fa fa-fw fa-calendar"></i><h5>'+obj.name+'</h5><h6>'+ obj.auction_id+'</h6>'+                    
+        '</a>'
+	);
 }
 
 
@@ -317,7 +353,20 @@ function sendDatabyPost(path,json,successmsg){
     });
 }
 
-
+// send data to update onogoing panel
+function sendDataOngoing(){
+	$.ajax({
+		url : "http://127.0.0.1:3000/auctions/current",
+		type : "GET",
+		dataType : 'json',
+		success : function(data, textStatus, jqXHR){
+			$("#current-auctions").html("");
+			var res = jqXHR.responseJSON;
+			res.forEach(filterOngoingPanel);
+		}
+	});
+}
+setInterval(sendDataOngoing,(10*1000));
 
 //-------------------table load -----------------------//
 

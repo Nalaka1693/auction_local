@@ -142,6 +142,14 @@ function setConWinData(){
     $("#itemdesc-label").text(itemdesc);
 }
 
+
+//set data for view win
+function setViewData(){
+    $("#itemid-view").text(itemid);
+    $("#itemname-view").text(itemname);
+    $("#itemdesc-view").text(itemdesc);
+}
+
     
     
 //-------------------support functions ----------------------//
@@ -191,6 +199,28 @@ function tablerefresh(){
             {"data":"btn"}
         ]
     });
+	
+	$("#item-table tr td:first-child").css('cursor', 'pointer');
+		$('#item-table').on('click', 'tr td:first-child', function () {
+        	var data = table.row( this ).data();
+			var obj = {"item_id":data.item_id};
+			//send ajax
+			$.ajax({
+				url : "http://127.0.0.1:3000/items/edit",
+				type : 'POST',
+				dataType: "json",
+				data : obj,
+				success : function(data,textStatus,jqXHR){
+					var response = jqXHR.responseJSON[0];
+					itemid = response.item_id;
+					itemname = response.item_name;
+					itemdesc = response.description;
+					setViewData();
+					$("#view-item-modal").modal();
+
+				}
+			});
+    	} );
 }
 
 

@@ -35,6 +35,33 @@ router.get('/initial', function(req, res, next) {
     });
 });
 
+
+
+router.get('/current', function(req, res, next) {
+    const results = [];
+
+    pg.connect(connectionString, function(err, client, done) {
+        // Handle connection errors
+        if(err) {
+            done();
+            console.log(err);
+            return res.status(500).json({success: false, data: err});
+        }
+        // SQL Query > Select Data // edit for current auctions
+        const query = client.query("SELECT * FROM auction");
+        // Stream results back one row at a time
+        query.on('row', function(row) {
+            results.push(row);
+        });
+        // After all data is returned, close connection and return results
+        query.on('end', function() {
+            done();
+            return res.json(results);
+        });
+    });
+});
+
+
 router.post('/new', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
@@ -88,7 +115,7 @@ router.post('/new', function(req, res, next) {
 });
 
 router.post('/edit', function(req, res, next) {
-    const results = [];
+    const results = [],vendors = [], items = [];
     // Get a Postgres client from the connection pool
     const data = {
         auid: req.body.auction_id,
@@ -103,14 +130,31 @@ router.post('/edit', function(req, res, next) {
             return res.status(500).json({success: false, data: err});
         }
         // SQL Query > Select Data
-        const query = client.query("SELECT * FROM auction WHERE auction_id=($1)", [data.auid]);
+        const query1 = client.query("SELECT * FROM auction WHERE auction_id=($1)", [data.auid]);
         // Stream results back one row at a time
-        query.on('row', function(row) {
+        query1.on('row', function(row) {
             results.push(row);
         });
+
+        const query2 = client.query("SELECT vendor_id FROM auction_vendors WHERE auction_id=($1)", [data.auid]);
+        // Stream results back one row at a time
+        query2.on('row', function(row) {
+            vendors.push(row);
+        });
+
+        const query3 = client.query("SELECT item_id FROM auction_items WHERE auction_id=($1)", [data.auid]);
+        // Stream results back one row at a time
+        query3.on('row', function(row) {
+            items.push(row);
+        });
+
+        results.push({"vendors":vendors});
+        results.push({"items":items});
+
         // After all data is returned, close connection and return results
-        query.on('end', function() {
+        query3.on('end', function() {
             done();
+            console.log(results);
             return res.json(results);
         });
     });

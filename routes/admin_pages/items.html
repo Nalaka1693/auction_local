@@ -341,7 +341,48 @@
         </div>
             
         
-            
+          <!--  View Item Modal  -->
+        <div id="view-item-modal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                
+            <!--   modal content   -->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <!--    cross button   -->
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Item Detail</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-lg-3">Item ID</div>
+                            <div class="col-lg-1">:</div>
+                            <div class="col-lg-6" id="itemid-view"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3">Item Name</div>
+                            <div class="col-lg-1">:</div>
+                            <div class="col-lg-6" id="itemname-view"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-3">Item Description</div>
+                            <div class="col-lg-1">:</div>
+                            <div class="col-lg-6" id="itemdesc-view"></div>
+                        </div>
+                        
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" data-dismiss="modal"  
+                                id="win-conf-item-btn">
+                                Confirm
+                        </button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal" id="conf-close-btn">Close</button>
+                    </div>
+                    
+                </div>
+            </div>    
+        </div>
+			
+			
         <!--  Delete Item  -->
         <div id="del-item-confirm-modal" class="modal fade" role="dialog">
             <div class="modal-dialog">
