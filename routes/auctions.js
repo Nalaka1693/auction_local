@@ -97,7 +97,7 @@ router.post('/new', function(req, res, next) {
             [data.auc_id, data.descrip, data.name, data.due_date, data.s_time, data.e_time, curr_date, data.cr_user]);
 
         data.vendors.forEach(function (vendor) {
-            client.query("INSERT INTO auction_vendors (auction_id, vendor_id) values ($1, $2)", [data.auc_id, vendor]);
+            client.query("INSERT INTO auction_vendors (auction_id, user_id) values ($1, $2)", [data.auc_id, vendor]);
         });
 
         data.items.forEach(function (item) {

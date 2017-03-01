@@ -76,6 +76,16 @@ $(document).on('click','.delBtn',function (d){
     //add code to give confirmation to delete
 });
 
+
+// Main window - Table - Bid button
+
+$(document).on('click','.bidBtn',function (d){
+	var uid = this.parentElement.parentElement.firstChild.innerHTML;
+	$("#bid-view-modal").modal();
+});
+			   
+
+
 // Main WIndow ongoing panel
 $(document).on('click','.ongoing-btn',function(d){
 	var uid = this.lastElementChild.innerHTML;
@@ -274,7 +284,9 @@ function filterTable(obj){
 	var btn = '<a class="delBtn btn btn-default btn-sm pull-right" href="#">'+
                 '<i class="fa fa-trash fa-fw"></i> </a>'+
                 '<a class="editBtn btn btn-default btn-sm pull-right" href="#">'+
-                '<i class="fa fa-pencil fa-fw"></i></a>';
+                '<i class="fa fa-pencil fa-fw"></i></a>'+
+				'<a class="bidBtn btn btn-default btn-sm pull-right" href="#">'+
+                '<i class="fa fa-money fa-fw"></i></a>';
     var newobj = {
 		"auction_id":tid,
 		"name": tiname,
