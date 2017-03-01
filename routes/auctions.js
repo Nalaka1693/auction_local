@@ -114,24 +114,24 @@ router.post('/edit', function(req, res, next) {
             auc_data.push(row);
         });
 
-        query = client.query("SELECT * FROM auction_vendors WHERE auction_id=($1)", [data.auc_id]);
+        query = client.query("SELECT user_id, fname, lname FROM users WHERE user_id in (SELECT user_id FROM auction_vendors WHERE auction_id=($1))", [data.auc_id]);
         query.on('row', function(row) {
             vendors.push(row);
         });
 
-        query = client.query("SELECT * FROM auction_items WHERE auction_id=($1)", [data.auc_id]);
+        query = client.query("SELECT item_id, item_name FROM items WHERE item_id in (SELECT item_id FROM auction_items WHERE auction_id=($1)", [data.auc_id]);
         query.on('row', function(row) {
             items.push(row);
         });
 
         var results = {
-            decrip: auc_data.description,
-            name: auc_data.name,
-            due_date: auc_data.due_date,
-            start_time: auc_data.start_time,
-            end_time: auc_data.end_time,
-            date_created: auc_data.date_created,
-            created_by: auc_data.created_by,
+            decrip: auc_data[0].description,
+            name: auc_data[0].name,
+            due_date: auc_data[0].due_date,
+            start_time: auc_data[0].start_time,
+            end_time: auc_data[0].end_time,
+            date_created: auc_data[0].date_created,
+            created_by: auc_data[0].created_by,
             vendors: vendors,
             items: items
         };

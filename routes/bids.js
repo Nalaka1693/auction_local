@@ -46,11 +46,9 @@ router.post('/add/confirm', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
     const data = {
-        bid_id: req.body.bid_id,
         auc_id: req.body.auction_id,
         i_id: req.body.item_id,
         ven_id: req.body.vendors_id,
-        time: req.body.time,
         bid_amnt: req.body.bid_amount
     };
 
@@ -63,9 +61,11 @@ router.post('/add/confirm', function(req, res, next) {
         }
         var curr_time = getTime();
 
+        var query;
+
         // SQL Query > Insert Data
         for (var i = 0; i < data.i_id.length; ++i) {
-            client.query("INSERT INTO bid(auction_id, item_id, vendor_id, time, bid_amount) values($1, $2, $3, $4, $5)",
+            query = client.query("INSERT INTO bid(auction_id, item_id, vendor_id, time, bid_amount) values($1, $2, $3, $4, $5)",
                 [data.auc_id, data.i_id[i], data.ven_id, curr_time, data.bid_amnt[i]]);
         }
 
@@ -78,6 +78,38 @@ router.post('/add/confirm', function(req, res, next) {
             done();
             // console.log(results);
             return res.json({"msg": 'Bid added successfully'});
+        });
+    });
+});
+
+router.post('/history', function(req, res, next) {
+    const results = [];
+    // Get a Postgres client from the connection pool
+    const data = {
+        auc_id: req.body.auction_id
+    };
+
+    pg.connect(connectionString, function(err, client, done) {
+        // Handle connection errors
+        if(err) {
+            done();
+            console.log(err);
+            return res.status(500).json({success: false, data: err});
+        }
+
+        // SQL Query > Insert Data
+        var query = client.query("SELECT item_id, bid_amount FROM bid GROUP BY vendor_id, time LIMIT 20");
+
+        // Stream results back one row at a time
+        query.on('row', function(row) {
+            results.push(row);
+        });
+
+        // After all data is returned, close connection and return results
+        query.on('end', function() {
+            done();
+            // console.log(results);
+            return res.json(results);
         });
     });
 });
