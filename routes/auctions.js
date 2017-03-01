@@ -138,38 +138,29 @@ router.post('/edit', function(req, res, next) {
             return res.status(500).json({success: false, data: err});
         }
         // SQL Query > Select Data
-        var query = client.query("SELECT * FROM auction WHERE auction_id=($1)", [data.auc_id]);
-        query.on('row', function(row) {
+        var query1 = client.query("SELECT * FROM auction WHERE auction_id=($1)", [data.auc_id]);
+        query1.on('row', function(row) {
             auc_data.push(row);
         });
 
-        query = client.query("SELECT * FROM auction_vendors WHERE auction_id=($1)", [data.auc_id]);
-        query.on('row', function(row) {
+        var query2 = client.query("SELECT user_id,lname,fname FROM users WHERE user_id in (SELECT user_id FROM auction_vendors WHERE auction_id=($1))", [data.auc_id]);
+        query2.on('row', function(row) {
             vendors.push(row);
         });
-
-        query = client.query("SELECT * FROM auction_items WHERE auction_id=($1)", [data.auc_id]);
-        query.on('row', function(row) {
+0
+        var query3 = client.query("SELECT item_id,item_name FROM items WHERE item_id in (SELECT item_id from auction_items WHERE auction_id=($1))", [data.auc_id]);
+        query3.on('row', function(row) {
             items.push(row);
         });
 
-        var results = {
-            decrip: auc_data.description,
-            name: auc_data.name,
-            due_date: auc_data.due_date,
-            start_time: auc_data.start_time,
-            end_time: auc_data.end_time,
-            date_created: auc_data.date_created,
-            created_by: auc_data.created_by,
-            vendors: vendors,
-            items: items
-        };
+
 
         // After all data is returned, close connection and return results
         query3.on('end', function() {
             done();
-            console.log(results);
-            return res.json(results);
+            auc_data.push(vendors);
+            auc_data.push(items);
+            return res.json(auc_data);
         });
     });
 });
@@ -225,7 +216,7 @@ router.delete('/del', function(req, res, next) {
             return res.status(500).json({success: false, data: err});
         }
         // SQL Query > Delete Data
-        const query = client.query("DELETE FROM auctions WHERE auction_id=($1)", [data.uid]);
+        const query = client.query("DELETE FROM auction WHERE auction_id=($1)", [data.uid]);
         // Stream results back one row at a time
         query.on('row', function(row) {
             results.push(row);

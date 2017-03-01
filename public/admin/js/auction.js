@@ -37,19 +37,19 @@ $(document).on('click','.editBtn',function (d){
 		data : obj,
 		success: function(data, textStatus,jqXHR){
 			var response = jqXHR.responseJSON;
-			aucid = response[2].auction_id;
-			aucname = response[2].name;
-			aucdesc = response[2].description;
-			duedate = response[2].due_date;
-			stime = response[2].start_time;
-			etime = response[2].end_time;
-			vendors = response[0].vendors;
-			items = response[1].items;
+			aucid = response[0].auction_id;
+			aucname = response[0].name;
+			aucdesc = response[0].description;
+			duedate = response[0].due_date.substring(0,10);
+			stime = response[0].start_time;
+			etime = response[0].end_time;
+			vendors = response[1];
+			items = response[2];
 			vendors.forEach(function(data){
-				
+				n_vendors.push(data.fname+" "+data.lname+"-"+data.user_id);
 			});
 			items.forEach(function(data){
-				
+				n_items.push(data.item_name+"-"+data.item_id);
 			});
 			setDataAddForm();
 			$("#aucid").prop('disabled',true);
@@ -81,6 +81,19 @@ $(document).on('click','.delBtn',function (d){
 
 $(document).on('click','.bidBtn',function (d){
 	var uid = this.parentElement.parentElement.firstChild.innerHTML;
+	var obj = {"auction_id":uid};
+	$.ajax({
+		url : "http://127.0.0.1:3000/auctions/biddata",
+		type : "POST",
+		data : obj,
+		dataType : "json",
+		success :function(data,textStatus,jqXHR){
+			var res = jqXHR.responseJSON[0];
+			// data of bid
+		}
+	})
+	
+	
 	$("#bid-view-modal").modal();
 });
 			   
@@ -142,8 +155,19 @@ $("#conf-close-btn").click(function (d){
 });
 
 // del confirm window - yes btn
-$("#del-auc-cbtn").click(function(d) {
+$("#del-auc-btn").click(function(d) {
     //ajax to del
+	var json = { "auction_id" : deluid };
+    var path = "http://127.0.0.1:3000/auctions/del"; //give path
+    $.ajax({
+        url : path,
+        dataType: "json",
+        data : json,
+        type : "DELETE",
+        success:function(data,textStatus,jqXHR){
+            sendDatatoUpdate({},"http://127.0.0.1:3000/auctions/initial");
+        }
+    })
 });
 
 //del confirm window- no btn
@@ -226,6 +250,17 @@ function setDataOnConf(){
 	$("#itemlist-label").text(n_items.toString());
 }
 
+//set data on conf modal
+function setDataOnView(){
+    $("#aucid-view").text(aucid);
+    $("#aucname-view").text(aucname);
+    $("#aucdesc-view").text(aucdesc);
+    $("#duedate-view").text(duedate);
+    $("#stime-view").text(stime);
+    $("#etime-view").text(etime);
+	$("#venlist-view").text(n_vendors.toString());
+	$("#itemlist-view").text(n_items.toString());
+}
 
 
 // get date from search
@@ -325,6 +360,42 @@ function tablerefresh(){
 			{"data":"btn"}
 		]
 	});
+	
+	$("#auc-table tr td:first-child").css('cursor', 'pointer');
+	$('#auc-table').on('click', 'tr td:first-child', function () {
+		var data = table.row( this ).data();
+		var obj = {"auction_id":data.auction_id};
+		//send ajax
+		n_vendors=[];
+		n_items=[];
+		$.ajax({
+			url : "http://127.0.0.1:3000/auctions/edit",
+			type : "POST",
+			dataType : "json",
+			data : obj,
+			success: function(data, textStatus,jqXHR){
+				var response = jqXHR.responseJSON;
+				aucid = response[0].auction_id;
+				aucname = response[0].name;
+				aucdesc = response[0].description;
+				duedate = response[0].due_date.substring(0,10);
+				stime = response[0].start_time;
+				etime = response[0].end_time;
+				vendors = response[1];
+				items = response[2];
+				vendors.forEach(function(data){
+					n_vendors.push(data.fname+" "+data.lname+"-"+data.user_id);
+				});
+				items.forEach(function(data){
+					n_items.push(data.item_name+"-"+data.item_id);
+				});
+				setDataOnView();
+				$("#view-auc-modal").modal();
+
+			}
+
+		});	
+	} );
 }
 
 // ajax post msg
@@ -378,7 +449,7 @@ function sendDataOngoing(){
 		}
 	});
 }
-setInterval(sendDataOngoing,(10*1000));
+//setInterval(sendDataOngoing,(10*1000));
 
 //-------------------table load -----------------------//
 
