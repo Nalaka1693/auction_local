@@ -42,6 +42,41 @@ router.post('/add', function(req, res, next) {
     });
 });
 
+
+
+router.post('/getlatest', function(req, res, next) {
+    const results = [];
+    // Get a Postgres client from the connection pool
+    const data = {
+        auc_id: req.body.auction_id
+    };
+
+    pg.connect(connectionString, function(err, client, done) {
+        // Handle connection errors
+        if(err) {
+            done();
+            console.log(err);
+            return res.status(500).json({success: false, data: err});
+        }
+
+        // SQL Query > Insert Data
+        var query = client.query("SELECT item_id, MIN(bid_amount) FROM bid WHERE auction_id=($1) GROUP BY item_id", [data.auc_id]);
+
+        // Stream results back one row at a time
+        query.on('row', function(row) {
+            results.push(row);
+        });
+
+        // After all data is returned, close connection and return results
+        query.on('end', function() {
+            done();
+            // console.log(results);
+            return res.json(results);
+        });
+    });
+});
+
+
 router.get('/test', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
@@ -56,8 +91,7 @@ router.get('/test', function(req, res, next) {
         }
 
         // SQL Query > Insert Data
-        var query = client.query("SELECT item_id,item_name FROM items WHERE item_id in " +
-            "(SELECT item_id from auction_items WHERE auction_id='auc002')");
+        var query = client.query("SELECT * FROM bid");
         // Stream results back one row at a time
         query.on('row', function(row) {
             results.push(row);
