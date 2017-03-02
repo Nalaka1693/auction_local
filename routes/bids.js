@@ -60,7 +60,7 @@ router.post('/getlatest', function(req, res, next) {
         }
 
         // SQL Query > Insert Data
-        var query = client.query("SELECT item_id, MIN(bid_amount) FROM bid WHERE auction_id=($1) GROUP BY item_id", [data.auc_id]);
+        var query = client.query("SELECT item_id,vendor_id, MIN(bid_amount) FROM bid WHERE auction_id=($1) GROUP BY item_id,vendor_id", [data.auc_id]);
 
         // Stream results back one row at a time
         query.on('row', function(row) {

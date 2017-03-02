@@ -1,10 +1,11 @@
 //----------------global variales --------------------//
 var aucid, aucdesc, aucname, duedate, stime, etime, cdate,user, vendors,items;
-var s_aucid, s_aucname, s_sdate, s_edate, deluid,table;
+var s_aucid, s_aucname, s_sdate, s_edate, deluid,table,vendorn,itemlist;
 var newaucenabled=true;
 var n_vendors,n_items;
 var p_data,table;
 var item_minbid = [];
+
 
 
 
@@ -17,6 +18,7 @@ $("#new-auc-add-btn").click(function(d){
 	items =[];
     newaucenabled = true;
     clearDataAddForm();
+	refreshTypehead();
     $("#aucid").prop('disabled',false);
     $("#add-auc-window-au-btn").text("Create");
     $("#new-auction-modal").modal();
@@ -86,9 +88,11 @@ $(document).on('click','.delBtn',function (d){
 // Main window - Table - Bid button
 
 $(document).on('click','.bidBtn',function (d){
-	var uid = this.parentElement.parentElement.firstChild.innerHTML;
-	var obj = {"auction_id": uid};
+	var biduid = this.parentElement.parentElement.firstChild.innerHTML;
+	var bidname = this.parentElement.parentElement.children[1].innerHTML;
+	var obj = {"auction_id": biduid};
 	$("#bids").html("");
+	$("#bid-header").text(bidname+" : "+biduid);
 	$.ajax({
 		url : "http://127.0.0.1:3000/items/aucitems",
 		type : "POST",
@@ -98,8 +102,8 @@ $(document).on('click','.bidBtn',function (d){
 			var res = jqXHR.responseJSON;
 			// data of bid
 			res.forEach(popbids);
-			
-			
+			////////////////////////
+			updatebids();
 			$("#bid-view-modal").modal();
 		}
 	})
@@ -348,7 +352,43 @@ function getDatafromSearch(){
     s_edate = $("#search-auc-edate").val();
 }
 
-//--------------------sup -------------------------//
+
+
+
+//bid val update
+function updatebids(){
+	var uid = document.getElementById("bid-header").innerHTML.split(": ")[1];
+	var count = document.getElementById("bids").childElementCount;
+	var obj = {"auction_id":uid};
+	var id,name,bidval;
+	$.ajax({
+		url: "http://127.0.0.1:3000/bids/getlatest",
+		type: 'POST',
+		data : obj,
+		dataType : 'json',
+		success :function(data,textStatus,jqXHR){
+			var res = jqXHR.responseJSON;
+			for(i=0;i<count;i++){
+				id = document.getElementById("bids").childNodes[i].childNodes[0].childNodes[1].firstChild.childNodes[1].innerHTML;
+				var idobj = res.forEach(function(datao){
+					if(datao.item_id==id){
+						document.getElementById("bids").childNodes[i].firstChild.firstChild.firstChild.childNodes[1].childNodes[0].innerHTML = datao.min;
+						document.getElementById("bids").childNodes[i].firstChild.firstChild.firstChild.childNodes[1].childNodes[1].innerHTML = datao.vendor_id;
+					}
+				});
+				
+				
+			}
+		}
+	})
+	
+	
+	
+}
+//-----
+
+
+//---------------sup -------------------------//
 function checkEmpty(a){
     return a.length===0;
 }
@@ -597,6 +637,17 @@ function sendDataOngoing(){
 		}
 	});
 }
+
+
+
+
+
+function refreshTypehead(){
+	vendorn.clearPrefetchCache();
+	itemlist.clearPrefetchCache();
+	vendorn.initialize();
+	itemlist.initialize();
+}
 //setInterval(sendDataOngoing,(10*1000));
 
 //-------------------table load -----------------------//
@@ -634,7 +685,7 @@ $(document).ready(function (d){
 	//------------------tags----------------------------//
 	//
 
-	var vendorn = new Bloodhound({
+	vendorn = new Bloodhound({
 		datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
 		queryTokenizer: Bloodhound.tokenizers.whitespace,
 		prefetch : {
@@ -649,7 +700,7 @@ $(document).ready(function (d){
 	});
 
 
-	var itemlist = new Bloodhound({
+	itemlist = new Bloodhound({
 		datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
 		queryTokenizer: Bloodhound.tokenizers.whitespace,
 		prefetch : {
