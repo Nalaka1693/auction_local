@@ -51,7 +51,8 @@ router.post('/new', function(req, res, next) {
         date_cr: req.body.date_created,
         cr_user: req.body.created_by,
         vendors: req.body.vendors,
-        items: req.body.items
+        items: req.body.items,
+        item_val : req.body.item_value
     };
     console.log(data);
     pg.connect(connectionString, function(err, client, done) {
@@ -64,7 +65,7 @@ router.post('/new', function(req, res, next) {
 
         var date = new Date();
         var curr_date = date.getFullYear() +'-'+ date.getMonth() +'-'+ date.getDate();
-
+        var curr_time = date.getHours()+':'+date.getMinutes()+':'+date.getSeconds();
         // SQL Query > Insert Data
         const query = client.query("INSERT INTO auction(auction_id, description, name, due_date, start_time, end_time, date_created, created_by) " +
             "values($1, $2, $3, $4, $5, $6, $7, $8)",
@@ -76,6 +77,11 @@ router.post('/new', function(req, res, next) {
 
         data.items.forEach(function (item) {
             client.query("INSERT INTO auction_items (auction_id, item_id) values ($1, $2)", [data.auc_id, item]);
+        });
+
+        data.item_val.forEach(function (ival) {
+            client.query("INSERT INTO bid (auction_id,item_id,vendor_id,time,bid_amount) VALUES ($1,$2,$3,$4,$5)",
+                [data.auc_id,ival.item_id,data.cr_user,curr_time,ival.value]);
         });
 
 
@@ -188,7 +194,12 @@ router.post('/del', function(req, res, next) {
             return res.status(500).json({success: false, data: err});
         }
         // SQL Query > Delete Data
+
+        const query1 = client.query("DELETE FROM auction_items WHERE auction_id=($1)",[data.uid]);
+        const query2 = client.query("DELETE FROM auction_vendors WHERE auction_id=($1)",[data.uid]);
+        const query3 = client.query("DELETE FROM bid WHERE auction_id=($1)",[data.uid]);
         const query = client.query("DELETE FROM auction WHERE auction_id=($1)", [data.uid]);
+
         // Stream results back one row at a time
         query.on('row', function(row) {
             results.push(row);
