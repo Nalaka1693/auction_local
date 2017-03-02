@@ -38,9 +38,9 @@ function updateModal(data) {
 
     $('#modal').append(
 
-            '<div class="col-sm-4"><font color="#703577" size="5" style="font-family:Tw Cen MT"><strong>'+data.item_name+'</strong></font><br>'+
+            '<div class="col-sm-4"><font color="#703577" size="5" style="font-family:Tw Cen MT"><strong>'+data.item_id+'</strong></font><br>'+
                 '<strong><h4 style="color:red">Current Lowest Bid</h4></strong>'+
-                '<h3 style="color:green; size:13">'+data.bid+'</h3>'+
+                '<h3 style="color:green; size:13">'+data.min+' $</h3>'+
                     '<div><strong>Update Your Bid</strong></div><br>'+
                         '<div class="input-prepend input-append margin-2">'+
                             '<div style="padding-left:0px">'+
@@ -52,10 +52,10 @@ function updateModal(data) {
     )
 }
 
-
+var auid;
 
 $(document).on('click','.add_bid-btn',function (d) {
-    var auid = this.parentNode.parentNode.firstChild.firstChild.childNodes[1].firstChild.firstChild.nodeValue;
+     auid = this.parentNode.parentNode.firstChild.firstChild.childNodes[1].firstChild.firstChild.nodeValue;
     var object = {"auction_id":auid};
 
     loadModalData(object);

@@ -256,35 +256,5 @@ router.delete('/del', function(req, res, next) {
     });
 });
 
-router.get('/search', function(req, res, next) {
-    const results = [];
-    // Get a Postgres client from the connection pool
-    const data = {
-        uid: req.body.user_id,
-        name: req.body.name,
-        date_cr: req.body.date_created
-    };
-
-    pg.connect(connectionString, function(err, client, done) {
-        // Handle connection errors
-        if(err) {
-            done();
-            console.log(err);
-            return res.status(500).json({success: false, data: err});
-        }
-        // SQL Query > Select Data
-        const query = client.query("SELECT * FROM users WHERE user_id=($1)", [data.uid]);
-        // Stream results back one row at a time
-        query.on('row', function(row) {
-            results.push(row);
-        });
-        // After all data is returned, close connection and return results
-        query.on('end', function() {
-            done();
-            // console.log(results);
-            return res.send(results);
-        });
-    });
-});
 
 module.exports = router;

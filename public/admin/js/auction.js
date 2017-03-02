@@ -4,6 +4,7 @@ var s_aucid, s_aucname, s_sdate, s_edate, deluid,table;
 var newaucenabled=true;
 var n_vendors,n_items;
 var p_data,table;
+var item_minbid = [];
 
 
 
@@ -26,6 +27,7 @@ $("#new-auc-add-btn").click(function(d){
 $(document).on('click','.editBtn',function (d){
 	n_vendors=[];
 	n_items=[];
+	clearDataAddForm();
     var aid = this.parentNode.parentNode.childNodes[0].innerHTML;
     newaucenabled=false;
 	var obj = {"auction_id":aid};
@@ -66,6 +68,7 @@ $(document).on('click','.editBtn',function (d){
 });
 
 
+
 // Main Window - Table - Del Btn
 $(document).on('click','.delBtn',function (d){
     var uid = this.parentNode.parentNode.childNodes[0].innerHTML;
@@ -77,26 +80,37 @@ $(document).on('click','.delBtn',function (d){
 });
 
 
+
+
+
 // Main window - Table - Bid button
 
 $(document).on('click','.bidBtn',function (d){
 	var uid = this.parentElement.parentElement.firstChild.innerHTML;
-	var obj = {"auction_id":uid};
+	var obj = {"auction_id": uid};
+	$("#bids").html("");
 	$.ajax({
-		url : "http://127.0.0.1:3000/auctions/biddata",
+		url : "http://127.0.0.1:3000/items/aucitems",
 		type : "POST",
 		data : obj,
 		dataType : "json",
 		success :function(data,textStatus,jqXHR){
-			var res = jqXHR.responseJSON[0];
+			var res = jqXHR.responseJSON;
 			// data of bid
+			res.forEach(popbids);
+			
+			
+			$("#bid-view-modal").modal();
 		}
 	})
 	
 	
-	$("#bid-view-modal").modal();
+	
 });
 			   
+
+
+
 
 
 // Main WIndow ongoing panel
@@ -111,9 +125,12 @@ $(document).on('click','.ongoing-btn',function(d){
 		success:function(data,textStatus,jqXHR){
 			var res = jqXHR.responseJSON;
 			//open modal
+		
 		}
 	})
 });
+
+
 
 
 // Main window - search btn
@@ -126,13 +143,37 @@ $("#search-btn").click(function(d) {
     } 
 });
 
-//add auc window - confirm
+
+
+
+
+
+//add auc window - create
 $("#win-add-auc-btn").click(function (d){
     getDataAddForm();
-    setDataOnConf();
-    $("#add-auc-conf-modal").modal();
+    //setDataOnConf();
+    //$("#add-auc-conf-modal").modal();
+	$("#bid-min").html("");
+	$("#auc-min-head").text(aucname);
+	n_items.forEach(itemaddvalue);
+	$("#add-bid-min-modal").modal();
     
 });
+
+
+
+//item bid min window - next
+$("#bid-min-conf").click(function (d){
+	var itemcount = this.parentNode.parentNode.children[1].firstElementChild.childElementCount;
+	var element = this;
+	getDataItemMinForm(itemcount,element);
+	setDataOnConf();
+    $("#add-auc-conf-modal").modal();
+})
+
+
+
+
 
 //add confirm window - confirm
 $("#win-conf-auc-btn").click(function (d){
@@ -148,11 +189,27 @@ $("#win-conf-auc-btn").click(function (d){
 	}
 });
 
+
+
+
+
+
 //add confirm window- close
 $("#conf-close-btn").click(function (d){
 	setDataAddForm();
+	vendors = [];
+	items = [];
 	$("#new-auction-modal").modal();
 });
+
+
+$("#bid-min-close").click(function (d){
+	setDataAddForm();
+	vendors = [];
+	items = [];
+	$("#new-auction-modal").modal();
+})
+
 
 // del confirm window - yes btn
 $("#del-auc-btn").click(function(d) {
@@ -163,12 +220,16 @@ $("#del-auc-btn").click(function(d) {
         url : path,
         dataType: "json",
         data : json,
-        type : "DELETE",
+        type : "POST",
         success:function(data,textStatus,jqXHR){
             sendDatatoUpdate({},"http://127.0.0.1:3000/auctions/initial");
         }
     })
 });
+
+
+
+
 
 //del confirm window- no btn
 $("#del-auc-close-btn").click(function(d) {
@@ -190,6 +251,7 @@ function getDataAddForm(){
     n_vendors = $("#ven-list").val().split(",");
     n_items = $("#item-list").val().split(",");
     
+	
 	n_vendors.forEach(function(data){
 		vendors.push(data.split("-")[1]);
 	});
@@ -262,6 +324,22 @@ function setDataOnView(){
 	$("#itemlist-view").text(n_items.toString());
 }
 
+//get data from item bid min form
+function getDataItemMinForm(count,element){
+	var box;
+	var val;
+	var id;
+	item_minbid = [];
+	for(i=0;i<count;i++){
+		box = element.parentNode.parentNode.children[1].firstElementChild.childNodes[i]
+		val = box.firstChild.firstChild.firstChild.firstChild.children[1].value;
+		id = box.firstChild.children[1].firstChild.children[1].innerHTML;
+		var obj = {"item_id" : id,"value":val};
+		item_minbid.push(obj);
+	}
+}
+
+
 
 // get date from search
 function getDatafromSearch(){
@@ -282,19 +360,87 @@ function diff(start, end) {
     var startDate = new Date(0, 0, 0, start[0], start[1], 0);
     var endDate = new Date(0, 0, 0, end[0], end[1], 0);
     var diff = endDate.getTime() - startDate.getTime();
-    var hours = Math.floor(diff / 1000 / 60 / 60);
-    diff -= hours * 1000 * 60 * 60;
-    var minutes = Math.floor(diff / 1000 / 60);
+	
+	if(Math.floor(diff/1000)<30){
+		return "just now";
+	}
+	else if(Math.floor(diff/1000<60)){
+		return "few seconds ago";
+	}
+	else{
+		var hours = Math.floor(diff / 1000 / 60 / 60);
+		if(hours <1){
+			diff -= hours * 1000 * 60 * 60;
+			var minutes = Math.floor(diff / 1000 / 60);
+			return minutes +" minutes ago";	
+		}
+		else{
+			return hours + " hours ago";
+		}
+		
+	}
 
     // If using time pickers with 24 hours format, add the below line get exact hours
-    if (hours < 0)
-       hours = hours + 24;
-
-    return (hours <= 9 ? "0" : "") + hours + ":" + (minutes <= 9 ? "0" : "") + minutes;
 }
 
 
 
+// create items in bid modal
+
+function popbids(data){
+	var id = data.item_id;
+	var name = data.item_name;
+	var htmlcontent = '<div class="col-lg-4">'+
+                                '<div class="panel panel-primary">'+
+									'<div class="panel-heading">'+
+										'<div class="row">'+
+											'<div class="col-lg-3"></div>'+
+											'<div class="col-lg-9 text-right">'+
+												'<div class="huge" id="vcount">'+"Bidval"+'</div>'+
+												'<div>'+"Vendor name!"+'</div>'+
+											'</div>'+
+										'</div>'+
+									'</div>'+
+									'<a>'+
+										'<div class="panel-footer">'+
+											'<span class="pull-left">'+name+'</span>'+
+											'<span class="pull-left">'+id+'</span>'+
+											'<div class="clearfix"></div>'+
+										'</div>'+
+									'</a>'+
+                        		'</div>'+
+                            '</div>';
+	
+	$("#bids").append(htmlcontent);
+}
+
+function itemaddvalue(data){
+	var name = data;
+	var htmlc = '<div class="col-lg-4">'+
+					'<div class="panel panel-primary">'+
+						'<div class="panel-heading">'+
+							'<div class="row">'+
+								'<div class="col-lg-10 pull-right form-group input-group">'+
+									'<span data-brackets-id="267" class="input-group-addon">$</span>'+
+									'<input class="form-control" placeholder="Min Bid">'+
+								'</div>'+
+							'</div>'+
+						'</div>'+
+						'<a>'+
+							'<div class="panel-footer">'+
+								'<span class="pull-left">'+name.split("-")[0]+'</span>'+
+								'<span class="pull-left">'+name.split("-")[1]+'</span>'+
+								'<div class="clearfix"></div>'+
+							'</div>'+
+						'</a>'+
+					'</div>'+
+				'</div>';
+	$("#bid-min").append(htmlc);
+}
+
+
+
+// create json
 function createJSON(){
     var json = {
         auction_id : aucid,
@@ -305,7 +451,8 @@ function createJSON(){
         end_time : etime,
         vendors : vendors,
         items : items,
-		created_by: user
+		created_by: user,
+		item_value : item_minbid
     }
     return json;
 }
@@ -316,11 +463,11 @@ function filterTable(obj){
     var tid = obj.auction_id;
     var tiname = obj.name;
     var due_date = obj.due_date.substring(0,10);
-	var btn = '<a class="delBtn btn btn-default btn-sm pull-right" href="#">'+
+	var btn = '<a class="delBtn btn btn-default btn-sm pull-right">'+
                 '<i class="fa fa-trash fa-fw"></i> </a>'+
-                '<a class="editBtn btn btn-default btn-sm pull-right" href="#">'+
+                '<a class="editBtn btn btn-default btn-sm pull-right">'+
                 '<i class="fa fa-pencil fa-fw"></i></a>'+
-				'<a class="bidBtn btn btn-default btn-sm pull-right" href="#">'+
+				'<a class="bidBtn btn btn-default btn-sm pull-right">'+
                 '<i class="fa fa-money fa-fw"></i></a>';
     var newobj = {
 		"auction_id":tid,
@@ -341,8 +488,8 @@ function filterOngoingPanel(obj){
 	var batch = diff(tstime,current_hour);
 	
 	$("#current-auctions").append(
-		'<a href="#" class="list-group-item ongoing-btn">'+
-        '<span class="badge">'+batch+' ago</span>'+
+		'<a class="list-group-item ongoing-btn">'+
+        '<span class="badge">'+batch+'</span>'+
         '<i class="fa fa-fw fa-calendar"></i><h5>'+obj.name+'</h5><h6>'+ obj.auction_id+'</h6>'+                    
         '</a>'
 	);
@@ -366,8 +513,7 @@ function tablerefresh(){
 		var data = table.row( this ).data();
 		var obj = {"auction_id":data.auction_id};
 		//send ajax
-		n_vendors=[];
-		n_items=[];
+
 		$.ajax({
 			url : "http://127.0.0.1:3000/auctions/edit",
 			type : "POST",
@@ -375,6 +521,8 @@ function tablerefresh(){
 			data : obj,
 			success: function(data, textStatus,jqXHR){
 				var response = jqXHR.responseJSON;
+				n_vendors=[];
+				n_items=[];
 				aucid = response[0].auction_id;
 				aucname = response[0].name;
 				aucdesc = response[0].description;
@@ -471,19 +619,20 @@ window.onload = function(){
 //	$("#start-time").timepicker();
 //	$("#end-time").timepicker();
 	tablerefresh();
-	sendDatatoUpdate({},"http://127.0.0.1:3000/auctions/initial");
-     
-    
+	sendDatatoUpdate({},"http://127.0.0.1:3000/auctions/initial");	
 }
+
+
+
+
+
 
 $(document).ready(function (d){
 
 	user = 'mas_admin';
 	
-
 	//------------------tags----------------------------//
 	//
-
 
 	var vendorn = new Bloodhound({
 		datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
@@ -543,6 +692,4 @@ $(document).ready(function (d){
 			$tag.hide().fadeIn();
 		}
 	});
-
-	
 })
