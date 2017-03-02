@@ -29,7 +29,7 @@ DESCRIPTION TEXT);
 
 CREATE TABLE AUCTION_VENDORS(
 AUCTION_ID VARCHAR(20) NOT NULL,
-VENDOR_ID VARCHAR(20) NOT NULL);
+USER_ID VARCHAR(20) NOT NULL);
 
 
 CREATE TABLE AUCTION_ITEMS(
@@ -54,7 +54,7 @@ ALTER TABLE AUCTION_VENDORS
 ADD FOREIGN KEY (AUCTION_ID) REFERENCES AUCTION;
 
 ALTER TABLE AUCTION_VENDORS
-ADD FOREIGN KEY (VENDOR_ID) REFERENCES USERS;
+ADD FOREIGN KEY (USER_ID) REFERENCES USERS;
 
 //add foreign key to auction items
 ALTER TABLE AUCTION_ITEMS
@@ -91,6 +91,16 @@ INSERT INTO bid(auction_id, item_id, vendor_id, time, bid_amount)
 SELECT item_id, MIN(bid_amount) FROM bid WHERE auction_id='AUC001' GROUP BY item_id;
 
 SELECT DISTINCT ON (item_id) item_id, MIN(bid_amount) OVER (PARTITION BY item_id) AS min_amount FROM bid WHERE auction_id='AUC001';
+
+SELECT item_id, bid_amount FROM bid GROUP BY vendor_id, time LIMIT 20
+
+SELECT m.item_id, m.bid_amount, t.mx
+FROM (
+    SELECT cname, MAX(avg) AS mx
+    FROM bid
+    GROUP BY cname
+    ) t JOIN bid m ON m.it = t.cname AND t.mx = m.avg
+;
 
 
 

@@ -121,13 +121,11 @@ router.post('/edit', function(req, res, next) {
         query2.on('row', function(row) {
             vendors.push(row);
         });
-0
+
         var query3 = client.query("SELECT item_id,item_name FROM items WHERE item_id in (SELECT item_id from auction_items WHERE auction_id=($1))", [data.auc_id]);
         query3.on('row', function(row) {
             items.push(row);
         });
-
-
 
         // After all data is returned, close connection and return results
         query3.on('end', function() {
