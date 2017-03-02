@@ -38,9 +38,10 @@ router.post('/logpost', function(req, res, next) {
             }
 
             if (data.passwd == results[0].password) {
-                if (results[0].role.toUpperCase() === 'ADMIN') {
+
+                if (results[0].role.toUpperCase() == "ADMIN") {
                     res.sendFile(__dirname + '/admin_pages/index.html');
-                } else if (results[0].role.toUpperCase() === 'VENDOR') {
+                } else if (results[0].role.toUpperCase() == "VENDOR") {
                     res.sendFile(__dirname + '/vendor_pages/index.html');
                 }
             } else {
