@@ -26,6 +26,7 @@ $("#new-auc-add-btn").click(function(d){
 $(document).on('click','.editBtn',function (d){
 	n_vendors=[];
 	n_items=[];
+	clearDataAddForm();
     var aid = this.parentNode.parentNode.childNodes[0].innerHTML;
     newaucenabled=false;
 	var obj = {"auction_id":aid};
@@ -81,20 +82,25 @@ $(document).on('click','.delBtn',function (d){
 
 $(document).on('click','.bidBtn',function (d){
 	var uid = this.parentElement.parentElement.firstChild.innerHTML;
-	var obj = {"auction_id":uid};
+	var obj = {"auction_id": uid};
+	$("#bids").html("");
 	$.ajax({
-		url : "http://127.0.0.1:3000/auctions/biddata",
+		url : "http://127.0.0.1:3000/items/aucitems",
 		type : "POST",
 		data : obj,
 		dataType : "json",
 		success :function(data,textStatus,jqXHR){
-			var res = jqXHR.responseJSON[0];
+			var res = jqXHR.responseJSON;
 			// data of bid
+			res.forEach(popbids);
+			
+			
+			$("#bid-view-modal").modal();
 		}
 	})
 	
 	
-	$("#bid-view-modal").modal();
+	
 });
 			   
 
@@ -111,6 +117,7 @@ $(document).on('click','.ongoing-btn',function(d){
 		success:function(data,textStatus,jqXHR){
 			var res = jqXHR.responseJSON;
 			//open modal
+		
 		}
 	})
 });
@@ -163,7 +170,7 @@ $("#del-auc-btn").click(function(d) {
         url : path,
         dataType: "json",
         data : json,
-        type : "DELETE",
+        type : "POST",
         success:function(data,textStatus,jqXHR){
             sendDatatoUpdate({},"http://127.0.0.1:3000/auctions/initial");
         }
@@ -282,19 +289,62 @@ function diff(start, end) {
     var startDate = new Date(0, 0, 0, start[0], start[1], 0);
     var endDate = new Date(0, 0, 0, end[0], end[1], 0);
     var diff = endDate.getTime() - startDate.getTime();
-    var hours = Math.floor(diff / 1000 / 60 / 60);
-    diff -= hours * 1000 * 60 * 60;
-    var minutes = Math.floor(diff / 1000 / 60);
+	
+	if(Math.floor(diff/1000)<30){
+		return "just now";
+	}
+	else if(Math.floor(diff/1000<60)){
+		return "few seconds ago";
+	}
+	else{
+		var hours = Math.floor(diff / 1000 / 60 / 60);
+		if(hours <1){
+			diff -= hours * 1000 * 60 * 60;
+			var minutes = Math.floor(diff / 1000 / 60);
+			return minutes +" minutes ago";	
+		}
+		else{
+			return hours + " hours ago";
+		}
+		
+	}
 
     // If using time pickers with 24 hours format, add the below line get exact hours
-    if (hours < 0)
-       hours = hours + 24;
-
-    return (hours <= 9 ? "0" : "") + hours + ":" + (minutes <= 9 ? "0" : "") + minutes;
 }
 
 
 
+// create items in bid modal
+
+function popbids(data){
+	var id = data.item_id;
+	var name = data.item_name;
+	var htmlcontent = '<div class="col-lg-4">'+
+                                '<div class="panel panel-primary">'+
+									'<div class="panel-heading">'+
+										'<div class="row">'+
+											'<div class="col-lg-3"></div>'+
+											'<div class="col-lg-9 text-right">'+
+												'<div class="huge" id="vcount">'+"Bidval"+'</div>'+
+												'<div>'+"Vendor name!"+'</div>'+
+											'</div>'+
+										'</div>'+
+									'</div>'+
+									'<a>'+
+										'<div class="panel-footer">'+
+											'<span class="pull-left">'+name+'</span>'+
+											'<span class="pull-left">'+id+'</span>'+
+											'<div class="clearfix"></div>'+
+										'</div>'+
+									'</a>'+
+                        		'</div>'+
+                            '</div>';
+	
+	$("#bids").append(htmlcontent);
+}
+
+
+// create json
 function createJSON(){
     var json = {
         auction_id : aucid,
@@ -316,11 +366,11 @@ function filterTable(obj){
     var tid = obj.auction_id;
     var tiname = obj.name;
     var due_date = obj.due_date.substring(0,10);
-	var btn = '<a class="delBtn btn btn-default btn-sm pull-right" href="#">'+
+	var btn = '<a class="delBtn btn btn-default btn-sm pull-right">'+
                 '<i class="fa fa-trash fa-fw"></i> </a>'+
-                '<a class="editBtn btn btn-default btn-sm pull-right" href="#">'+
+                '<a class="editBtn btn btn-default btn-sm pull-right">'+
                 '<i class="fa fa-pencil fa-fw"></i></a>'+
-				'<a class="bidBtn btn btn-default btn-sm pull-right" href="#">'+
+				'<a class="bidBtn btn btn-default btn-sm pull-right">'+
                 '<i class="fa fa-money fa-fw"></i></a>';
     var newobj = {
 		"auction_id":tid,
@@ -341,8 +391,8 @@ function filterOngoingPanel(obj){
 	var batch = diff(tstime,current_hour);
 	
 	$("#current-auctions").append(
-		'<a href="#" class="list-group-item ongoing-btn">'+
-        '<span class="badge">'+batch+' ago</span>'+
+		'<a class="list-group-item ongoing-btn">'+
+        '<span class="badge">'+batch+'</span>'+
         '<i class="fa fa-fw fa-calendar"></i><h5>'+obj.name+'</h5><h6>'+ obj.auction_id+'</h6>'+                    
         '</a>'
 	);
@@ -366,8 +416,7 @@ function tablerefresh(){
 		var data = table.row( this ).data();
 		var obj = {"auction_id":data.auction_id};
 		//send ajax
-		n_vendors=[];
-		n_items=[];
+
 		$.ajax({
 			url : "http://127.0.0.1:3000/auctions/edit",
 			type : "POST",
@@ -375,6 +424,8 @@ function tablerefresh(){
 			data : obj,
 			success: function(data, textStatus,jqXHR){
 				var response = jqXHR.responseJSON;
+				n_vendors=[];
+				n_items=[];
 				aucid = response[0].auction_id;
 				aucname = response[0].name;
 				aucdesc = response[0].description;
@@ -471,19 +522,20 @@ window.onload = function(){
 //	$("#start-time").timepicker();
 //	$("#end-time").timepicker();
 	tablerefresh();
-	sendDatatoUpdate({},"http://127.0.0.1:3000/auctions/initial");
-     
-    
+	sendDatatoUpdate({},"http://127.0.0.1:3000/auctions/initial");	
 }
+
+
+
+
+
 
 $(document).ready(function (d){
 
 	user = 'mas_admin';
 	
-
 	//------------------tags----------------------------//
 	//
-
 
 	var vendorn = new Bloodhound({
 		datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
@@ -543,6 +595,4 @@ $(document).ready(function (d){
 			$tag.hide().fadeIn();
 		}
 	});
-
-	
 })

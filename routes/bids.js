@@ -42,6 +42,39 @@ router.post('/add', function(req, res, next) {
     });
 });
 
+router.get('/test', function(req, res, next) {
+    const results = [];
+    // Get a Postgres client from the connection pool
+
+
+    pg.connect(connectionString, function(err, client, done) {
+        // Handle connection errors
+        if(err) {
+            done();
+            console.log(err);
+            return res.status(500).json({success: false, data: err});
+        }
+
+        // SQL Query > Insert Data
+        var query = client.query("SELECT item_id,item_name FROM items WHERE item_id in " +
+            "(SELECT item_id from auction_items WHERE auction_id='auc002')");
+        // Stream results back one row at a time
+        query.on('row', function(row) {
+            results.push(row);
+        });
+
+        // After all data is returned, close connection and return results
+        query.on('end', function() {
+            done();
+            // console.log(results);
+            return res.json(results);
+        });
+    });
+});
+
+
+
+
 router.post('/add/confirm', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
