@@ -10,7 +10,31 @@ router.get('/', function(req, res, next) {
     res.send('auctions');
 });
 
+router.get('/initial', function(req, res, next) {
+    const results = [];
 
+    pg.connect(connectionString, function(err, client, done) {
+        // Handle connection errors
+        if(err) {
+            done();
+            console.log(err);
+            return res.status(500).json({success: false, data: err});
+        }
+        // SQL Query > Insert Data
+        const query = client.query("SELECT * FROM auction");
+
+        // Stream results back one row at a time
+        query.on('row', function(row) {
+            results.push(row);
+        });
+        // After all data is returned, close connection and return results
+        query.on('end', function() {
+            done();
+            // console.log(results);
+            return res.json(results);
+        });
+    });
+});
 
 router.get('/current', function(req, res, next) {
     const results = [];
@@ -35,7 +59,6 @@ router.get('/current', function(req, res, next) {
         });
     });
 });
-
 
 router.post('/new', function(req, res, next) {
     const results = [];
@@ -104,7 +127,6 @@ router.post('/edit', function(req, res, next) {
     const items = [];
     const  vendors = [];
 
-
     // Get a Postgres client from the connection pool
     const data = {
         auc_id: req.body.auction_id
@@ -123,12 +145,12 @@ router.post('/edit', function(req, res, next) {
             auc_data.push(row);
         });
 
-        var query2 = client.query("SELECT user_id,lname,fname FROM users WHERE user_id in (SELECT user_id FROM auction_vendors WHERE auction_id=($1))", [data.auc_id]);
+        var query2 = client.query("SELECT user_id, lname, fname FROM users WHERE user_id in (SELECT user_id FROM auction_vendors WHERE auction_id=($1))", [data.auc_id]);
         query2.on('row', function(row) {
             vendors.push(row);
         });
 
-        var query3 = client.query("SELECT item_id,item_name FROM items WHERE item_id in (SELECT item_id from auction_items WHERE auction_id=($1))", [data.auc_id]);
+        var query3 = client.query("SELECT item_id, item_name FROM items WHERE item_id in (SELECT item_id from auction_items WHERE auction_id=($1))", [data.auc_id]);
         query3.on('row', function(row) {
             items.push(row);
         });
@@ -154,7 +176,9 @@ router.post('/edit/confirm', function(req, res, next) {
         s_time: req.body.s_time,
         e_time: req.body.e_time,
         date_cr: req.body.date_created,
-        cr_user: req.body.created_by
+        cr_user: req.body.created_by,
+        vendors: req.body.vendors,
+        items: req.body.items
     };
 
     pg.connect(connectionString, function(err, client, done) {
@@ -165,9 +189,14 @@ router.post('/edit/confirm', function(req, res, next) {
             return res.status(500).json({success: false, data: err});
         }
         // SQL Query > Update Data
-        const query = client.query("UPDATE auction SET description=($2), name=($3), due_date=($4), start_time=($5), " +
+        var query = client.query("UPDATE auction SET description=($2), name=($3), due_date=($4), start_time=($5), " +
             "end_time=($6), date_created=($7), created_by=($8) WHERE auction_id=($1)",
             [data.auc_id, data.descrip, data.name, data.due_date, data.s_time, data.e_time, data.date_cr, data.cr_user]);
+
+        data.vendors.forEach(function (vendor) {
+            client.query("UPDATE auction_vendors SET user_id");
+        });
+
         // Stream results back one row at a time
         query.on('row', function(row) {
             results.push(row);
