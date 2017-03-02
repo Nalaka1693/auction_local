@@ -38,10 +38,10 @@ router.post('/logpost', function(req, res, next) {
             }
 
             if (data.passwd == results[0].password) {
-                if (results[0].role == 'admin') {
+                if (results[0].role.toUpperCase() === 'ADMIN') {
                     res.sendFile(__dirname + '/admin_pages/index.html');
-                } else if (results[0].role == 'vendor') {
-                    res.send('Vendor login successful');
+                } else if (results[0].role.toUpperCase() === 'VENDOR') {
+                    res.sendFile(__dirname + '/vendor_pages/index.html');
                 }
             } else {
                 return res.redirect('http://localhost:3000/');
