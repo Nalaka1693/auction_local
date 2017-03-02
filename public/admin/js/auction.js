@@ -4,6 +4,7 @@ var s_aucid, s_aucname, s_sdate, s_edate, deluid,table;
 var newaucenabled=true;
 var n_vendors,n_items;
 var p_data,table;
+var item_minbid = [];
 
 
 
@@ -67,6 +68,7 @@ $(document).on('click','.editBtn',function (d){
 });
 
 
+
 // Main Window - Table - Del Btn
 $(document).on('click','.delBtn',function (d){
     var uid = this.parentNode.parentNode.childNodes[0].innerHTML;
@@ -76,6 +78,9 @@ $(document).on('click','.delBtn',function (d){
     $("#del-auction-confirm-modal").modal();
     //add code to give confirmation to delete
 });
+
+
+
 
 
 // Main window - Table - Bid button
@@ -105,6 +110,9 @@ $(document).on('click','.bidBtn',function (d){
 			   
 
 
+
+
+
 // Main WIndow ongoing panel
 $(document).on('click','.ongoing-btn',function(d){
 	var uid = this.lastElementChild.innerHTML;
@@ -123,6 +131,8 @@ $(document).on('click','.ongoing-btn',function(d){
 });
 
 
+
+
 // Main window - search btn
 $("#search-btn").click(function(d) {
     getDatafromSearch();
@@ -133,13 +143,37 @@ $("#search-btn").click(function(d) {
     } 
 });
 
-//add auc window - confirm
+
+
+
+
+
+//add auc window - create
 $("#win-add-auc-btn").click(function (d){
     getDataAddForm();
-    setDataOnConf();
-    $("#add-auc-conf-modal").modal();
+    //setDataOnConf();
+    //$("#add-auc-conf-modal").modal();
+	$("#bid-min").html("");
+	$("#auc-min-head").text(aucname);
+	n_items.forEach(itemaddvalue);
+	$("#add-bid-min-modal").modal();
     
 });
+
+
+
+//item bid min window - next
+$("#bid-min-conf").click(function (d){
+	var itemcount = this.parentNode.parentNode.children[1].firstElementChild.childElementCount;
+	var element = this;
+	getDataItemMinForm(itemcount,element);
+	setDataOnConf();
+    $("#add-auc-conf-modal").modal();
+})
+
+
+
+
 
 //add confirm window - confirm
 $("#win-conf-auc-btn").click(function (d){
@@ -155,11 +189,27 @@ $("#win-conf-auc-btn").click(function (d){
 	}
 });
 
+
+
+
+
+
 //add confirm window- close
 $("#conf-close-btn").click(function (d){
 	setDataAddForm();
+	vendors = [];
+	items = [];
 	$("#new-auction-modal").modal();
 });
+
+
+$("#bid-min-close").click(function (d){
+	setDataAddForm();
+	vendors = [];
+	items = [];
+	$("#new-auction-modal").modal();
+})
+
 
 // del confirm window - yes btn
 $("#del-auc-btn").click(function(d) {
@@ -176,6 +226,10 @@ $("#del-auc-btn").click(function(d) {
         }
     })
 });
+
+
+
+
 
 //del confirm window- no btn
 $("#del-auc-close-btn").click(function(d) {
@@ -197,6 +251,7 @@ function getDataAddForm(){
     n_vendors = $("#ven-list").val().split(",");
     n_items = $("#item-list").val().split(",");
     
+	
 	n_vendors.forEach(function(data){
 		vendors.push(data.split("-")[1]);
 	});
@@ -268,6 +323,22 @@ function setDataOnView(){
 	$("#venlist-view").text(n_vendors.toString());
 	$("#itemlist-view").text(n_items.toString());
 }
+
+//get data from item bid min form
+function getDataItemMinForm(count,element){
+	var box;
+	var val;
+	var id;
+	item_minbid = [];
+	for(i=0;i<count;i++){
+		box = element.parentNode.parentNode.children[1].firstElementChild.childNodes[i]
+		val = box.firstChild.firstChild.firstChild.firstChild.children[1].value;
+		id = box.firstChild.children[1].firstChild.children[1].innerHTML;
+		var obj = {"item_id" : id,"value":val};
+		item_minbid.push(obj);
+	}
+}
+
 
 
 // get date from search
@@ -343,6 +414,31 @@ function popbids(data){
 	$("#bids").append(htmlcontent);
 }
 
+function itemaddvalue(data){
+	var name = data;
+	var htmlc = '<div class="col-lg-4">'+
+					'<div class="panel panel-primary">'+
+						'<div class="panel-heading">'+
+							'<div class="row">'+
+								'<div class="col-lg-10 pull-right form-group input-group">'+
+									'<span data-brackets-id="267" class="input-group-addon">$</span>'+
+									'<input class="form-control" placeholder="Min Bid">'+
+								'</div>'+
+							'</div>'+
+						'</div>'+
+						'<a>'+
+							'<div class="panel-footer">'+
+								'<span class="pull-left">'+name.split("-")[0]+'</span>'+
+								'<span class="pull-left">'+name.split("-")[1]+'</span>'+
+								'<div class="clearfix"></div>'+
+							'</div>'+
+						'</a>'+
+					'</div>'+
+				'</div>';
+	$("#bid-min").append(htmlc);
+}
+
+
 
 // create json
 function createJSON(){
@@ -355,7 +451,8 @@ function createJSON(){
         end_time : etime,
         vendors : vendors,
         items : items,
-		created_by: user
+		created_by: user,
+		item_value : item_minbid
     }
     return json;
 }
