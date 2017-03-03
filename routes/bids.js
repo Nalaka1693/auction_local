@@ -60,7 +60,12 @@ router.post('/getlatest', function(req, res, next) {
         }
 
         // SQL Query > Insert Data
-        var query = client.query("SELECT item_id, MIN(bid_amount) FROM bid WHERE auction_id=($1) GROUP BY item_id", [data.auc_id]);
+        var query = client.query("SELECT DISTINCT ON (m.item_id) m.item_id, m.vendor_id, t.min " +
+            "FROM (" +
+                "SELECT item_id, MIN(bid_amount) AS  min " +
+                "FROM bid WHERE auction_id=($1) " +
+                "GROUP BY item_id " +
+                ") t JOIN bid m ON m.item_id=t.item_id AND t.min=m.bid_amount", [data.auc_id]);
 
         // Stream results back one row at a time
         query.on('row', function(row) {
@@ -70,7 +75,7 @@ router.post('/getlatest', function(req, res, next) {
         // After all data is returned, close connection and return results
         query.on('end', function() {
             done();
-            // console.log(results);
+            console.log(results);
             return res.json(results);
         });
     });
