@@ -26,7 +26,7 @@ router.post('/add', function(req, res, next) {
         }
 
         // SQL Query > Insert Data
-        var query = client.query("SELECT bid.item_id, items.item_name, MIN(bid.bid_amount) FROM bid" +
+        var query = client.query("SELECT bid.item_id, items.item_name, MIN(bid.bid_amount) FROM bid " +
             "INNER JOIN items ON bid.item_id=items.item_id where bid.auction_id=($1) group by items.item_id, bid.item_id;", [data.auc_id]);
 
         // Stream results back one row at a time
