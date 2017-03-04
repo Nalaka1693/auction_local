@@ -82,6 +82,42 @@ router.post('/getlatest', function(req, res, next) {
 });
 
 
+router.post('/historyad', function(req, res, next) {
+    const results = [];
+    // Get a Postgres client from the connection pool
+    const data = {
+        auc_id: req.body.auction_id,
+        item_id: req.body.item_id
+    };
+
+    console.log(data);
+    pg.connect(connectionString, function(err, client, done) {
+        // Handle connection errors
+        if(err) {
+            done();
+            console.log(err);
+            return res.status(500).json({success: false, data: err});
+        }
+
+        // SQL Query > Insert Data
+        var query = client.query("SELECT bid_id,vendor_id,time,bid_amount FROM bid WHERE auction_id=($1) AND item_id=($2)",
+            [data.auc_id,data.item_id]);
+
+        // Stream results back one row at a time
+        query.on('row', function(row) {
+            results.push(row);
+        });
+
+        // After all data is returned, close connection and return results
+        query.on('end', function() {
+            done();
+            //console.log(results);
+            return res.json(results);
+        });
+    });
+});
+
+
 router.get('/test', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
