@@ -3,7 +3,7 @@
  */
 
 // var send_auctionID = this.parentNode.parentNode.firstChild.firstChild.childNodes[1].firstChild.firstChild.nodeValue;
-var send_vendorID ="levi_1234";
+var send_vendorID ="VEN0001";
 var send_itemID =[];
 var send_bidVALUE =[];
 

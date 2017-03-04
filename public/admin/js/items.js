@@ -22,7 +22,7 @@ $(document).on('click','.editBtn',function(d){
     var obj = {"item_id":iid};
     //ajax
     $.ajax({
-        url : "http://127.0.0.1:3000/items/edit",
+        url : "http://localhost:3000/items/edit",
         type : "POST",
         dataType :"json",
         data : obj,
@@ -69,14 +69,14 @@ $("#win-conf-item-btn").click(function (d){
     if(additemenabled){
         //post req
         var obj = createJSON();
-        var path = "http://127.0.0.1:3000/items/add";
+        var path = "http://localhost:3000/items/add";
         sendDatabyPost(path,obj,"New Item Added");
         
     }
     else{
         //post req
         var obj = createJSON();
-        var path = "http://127.0.0.1:3000/items/edit/confirm";
+        var path = "http://localhost:3000/items/edit/confirm";
         sendDatabyPost(path,obj,"Item status updated");
     }
 });
@@ -92,7 +92,7 @@ $("#conf-close-btn").click(function (d){
 $("#del-item-cbtn").click(function(d) {
     //ajax to del
     var json = {"item_id": deluid};
-    var path = "http://127.0.0.1:3000/items/del";
+    var path = "http://localhost:3000/items/del";
     
     $.ajax({
         url : path,
@@ -100,7 +100,7 @@ $("#del-item-cbtn").click(function(d) {
         data : json,
         type : "DELETE",
         success:function(data,textStatus,jqXHR){
-             sendDatatoUpdate({},"http://127.0.0.1:3000/items/initial");
+             sendDatatoUpdate({},"http://localhost:3000/items/initial");
         }
     })
 })
@@ -206,7 +206,7 @@ function tablerefresh(){
 			var obj = {"item_id":data.item_id};
 			//send ajax
 			$.ajax({
-				url : "http://127.0.0.1:3000/items/edit",
+				url : "http://localhost:3000/items/edit",
 				type : 'POST',
 				dataType: "json",
 				data : obj,
@@ -254,7 +254,7 @@ function sendDatabyPost(path,json,successmsg){
         dataType : 'json',
         data : json,
         success:function(data,textStatus,jqXHR){
-            sendDatatoUpdate({},'http://127.0.0.1:3000/items/initial');
+            sendDatatoUpdate({},'http://localhost:3000/items/initial');
         },
         fail:function(jqXHR,textStatus,errorThrown){
            
@@ -277,5 +277,5 @@ function loadtable(data){
 window.onload = function(){
     p_data={"data":[]};
     tablerefresh();
-    sendDatatoUpdate({},'http://127.0.0.1:3000/items/initial');
+    sendDatatoUpdate({},'http://localhost:3000/items/initial');
 }

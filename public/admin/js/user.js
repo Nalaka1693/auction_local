@@ -134,13 +134,13 @@ $("#confirm-user-btn").click(function (d){
     if(adduserenabled){
         //add user ajax db req
         var obj = createJSON();
-        var path = "http://127.0.0.1:3000/users/add"; //give path
+        var path = "http://localhost:3000/users/add"; //give path
         sendDatabyPost(path,obj,"New User is added");
     }
     else{
         //update user db req
         var obj = createJSON();
-        var path = "http://127.0.0.1:3000/users/edit/confirm"; //give path
+        var path = "http://localhost:3000/users/edit/confirm"; //give path
         sendDatabyPost(path,obj,"User statys updated");
     }
     clearForm();
@@ -155,7 +155,7 @@ $(document).on('click','.editBtn',function (d){
     adduserenabled=false;
     //update form
     $.ajax({
-        url : "http://127.0.0.1:3000/users/edit",
+        url : "http://localhost:3000/users/edit",
         type : 'POST',
         dataType: "json",
         data : obj,
@@ -195,14 +195,14 @@ $(document).on('click','.delBtn',function (d){
 // Del confirm window - yes
 $("#del-user-btn").click(function(d) {
     var json = { "user_id" : deluid };
-    var path = "http://127.0.0.1:3000/users/del"; //give path
+    var path = "http://localhost:3000/users/del"; //give path
     $.ajax({
         url : path,
         dataType: "json",
         data : json,
         type : "DELETE",
         success:function(data,textStatus,jqXHR){
-            sendDatatoUpdate({},"http://127.0.0.1:3000/users/initial");
+            sendDatatoUpdate({},"http://localhost:3000/users/initial");
         }
     })
 });
@@ -269,7 +269,7 @@ function sendDatabyPost(path,json,successmsg){
         dataType : 'json',
         data : json,
         success:function(data,textStatus,jqXHR){
-            sendDatatoUpdate({},'http://127.0.0.1:3000/users/initial');
+            sendDatatoUpdate({},'http://localhost:3000/users/initial');
         },
         fail:function(jqXHR,textStatus,errorThrown){
            
@@ -330,7 +330,7 @@ function tablerefresh(){
 			var obj = {"user_id":data.user_id};
 			//send ajax
 			$.ajax({
-				url : "http://127.0.0.1:3000/users/edit",
+				url : "http://localhost:3000/users/edit",
 				type : 'POST',
 				dataType: "json",
 				data : obj,
@@ -379,7 +379,7 @@ window.onload = function(){
 //table format
 $(document).ready(function() {
     // DataTable
-    sendDatatoUpdate({},'http://127.0.0.1:3000/users/initial');
+    sendDatatoUpdate({},'http://localhost:3000/users/initial');
 });
 
 
