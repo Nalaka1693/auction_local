@@ -242,6 +242,79 @@ $("#del-auc-close-btn").click(function(d) {
 
 
 
+// bid view modal - history btn
+$("#history-btn").click(function(d) {
+	//get auction id and name
+	var aucid = this.parentElement.parentElement.children[0].children[1].innerHTML.split(": ")[1];
+	var aucname = this.parentElement.parentElement.children[0].children[1].innerHTML.split(": ")[0];
+	
+	// set auction id and auctin name on history modal header
+	$("#bid-history-header").text("History  :::    "+aucname+" : "+aucid);
+	//count the child elements
+	var nItems = this.parentElement.parentElement.children[1].children[0].childElementCount;
+	//make datatable array
+	var hisdatatable = [];
+	//clear curret data on panals
+	$("#bid-histoy-tables").html("");
+	
+	$.ajaxSetup({ async: false });
+	//populate history panels
+	for(i=0;i<nItems;i++){
+		// get item name and id for each item
+		var j = parseInt(i);
+		var itemnamep = this.parentElement.parentElement.children[1].children[0].children[i].firstChild.children[1].firstChild.children[0].innerHTML;
+//		var  = 
+		var itemidp = this.parentElement.parentElement.children[1].children[0].children[i].firstChild.children[1].firstChild.children[1].innerHTML;
+		//create a tableid
+		var histableid = "histable"+i;
+		//destroy existing datatables
+		try{
+			hisdatatable[i].destroy();
+		}
+		catch(e){
+			console.log(e);
+		}
+		//create sending object
+		var obj = {"auction_id" : aucid, item_id:  itemidp};
+		
+		$.ajax({
+			
+			url : "http://127.0.0.1:3000/bids/historyad",
+			type : 'POST',
+			dataType : 'json',
+			data : obj,
+			success : function(data,textStatus,jqXHR){
+				var res = data;
+				
+				addhistorypanels(itemidp,itemnamep,histableid);
+				historytablerefresh(hisdatatable[i],histableid,data);
+//				$("#"+histableid).addClass("table table-horver table-striped");
+			}
+		});
+		
+		
+		
+		
+	}
+	
+	$("#bid-history-modal").modal();
+	$.ajaxSetup({ async: true });
+
+});
+
+// collapse window in history window panels
+$(document).on('click','.panelcol',function(d){
+	var pn = this.parentElement.parentElement.parentElement.parentElement.children[1];
+	if(pn.classList.contains("collapse")){
+		pn.classList.remove("collapse");
+	}
+	else{
+		pn.classList.add("collapse");
+	}
+});
+
+
+
 //---------------forms------------------------------//
 
 //get date from add auction
@@ -479,6 +552,43 @@ function itemaddvalue(data){
 }
 
 
+//add history panels
+function addhistorypanels(itemid,itemname,tableid){
+	var htmlh = '<div class="row">'+
+                            '<div class="col-lg-12">'+
+                                '<div class="panel panel-info">'+
+									'<div class="panel-heading">'+
+										'<div class="row ">'+
+											'<div class="col-lg-1"></div>'+
+											'<div class="col-lg-9 text-left ">'+
+												'<a id="vcount" class="panelcol"  onmouseover=""'+
+												' style="cursor: pointer;">'+itemname+" : "+itemid+'</a>'+
+											'</div>'+
+										'</div>'+
+									'</div>'+
+									'<div class="panel body collapse">'+
+										'<div class="row">'+
+											'<div class="col-lg-12">'+
+												'<table class="table table-horver table-striped" id='+tableid+'>'+
+													'<thead>'+
+														'<tr>'+
+															'<th>Bid Id</th>'+
+															'<th>Vendor Id</th>'+
+															'<th>Time </th>'+
+															'<th>Amount</th>'+
+														'</tr>'+
+													'</thead>'+
+													'<tbody></tbody>'+
+												'</table>'+
+											'</div>'+
+										'</div>'+
+									'</div>'+
+                        		'</div>'+
+                            '</div>'+
+                        '</div>'
+	$("#bid-histoy-tables").append(htmlh);
+}
+
 
 // create json
 function createJSON(){
@@ -585,6 +695,22 @@ function tablerefresh(){
 		});	
 	} );
 }
+
+// table refresh in history 
+
+function historytablerefresh(datatable,table,data){
+	datatable = $("#"+table).DataTable({
+		"bPaginate" : true,
+		"aaData" : data,
+		"aoColumns" : [
+			{"data": "bid_id"},
+			{"data": "vendor_id"},
+			{"data": "time"},
+			{"data": "bid_amount"}
+		]
+	})
+}
+
 
 // ajax post msg
 function sendDatatoUpdate(jsonO,path,sucfunc,message){
