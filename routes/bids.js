@@ -150,7 +150,7 @@ router.post('/add/confirm', function(req, res, next) {
     const data = {
         auc_id: req.body.auction_id,
         i_id: req.body.item_id,
-        ven_id: req.body.vendors_id,
+        ven_id: req.body.vendor_id,
         bid_amnt: req.body.bid_amount
     };
 
