@@ -98,7 +98,6 @@ router.post('/edit', function(req, res, next) {
     });
 });
 
-
 router.post('/aucitems', function(req, res, next) {
     const results = [];
     var id = req.body.auction_id;
@@ -124,7 +123,6 @@ router.post('/aucitems', function(req, res, next) {
         });
     });
 });
-
 
 router.put('/edit/confirm', function(req, res, next) {
     const results = [];
