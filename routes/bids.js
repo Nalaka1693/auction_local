@@ -26,7 +26,8 @@ router.post('/add', function(req, res, next) {
         }
 
         // SQL Query > Insert Data
-        var query = client.query("SELECT item_id, MIN(bid_amount) FROM bid WHERE auction_id=($1) GROUP BY item_id", [data.auc_id]);
+        var query = client.query("SELECT bid.item_id, items.item_name, MIN(bid.bid_amount) FROM bid " +
+            "INNER JOIN items ON bid.item_id=items.item_id where bid.auction_id=($1) group by items.item_id, bid.item_id;", [data.auc_id]);
 
         // Stream results back one row at a time
         query.on('row', function(row) {
@@ -41,8 +42,6 @@ router.post('/add', function(req, res, next) {
         });
     });
 });
-
-
 
 router.post('/getlatest', function(req, res, next) {
     const results = [];
@@ -82,6 +81,7 @@ router.post('/getlatest', function(req, res, next) {
 });
 
 
+
 router.post('/historyad', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
@@ -118,6 +118,7 @@ router.post('/historyad', function(req, res, next) {
 });
 
 
+
 router.get('/test', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
@@ -146,9 +147,6 @@ router.get('/test', function(req, res, next) {
         });
     });
 });
-
-
-
 
 router.post('/add/confirm', function(req, res, next) {
     const results = [];

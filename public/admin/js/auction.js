@@ -302,6 +302,12 @@ $("#history-btn").click(function(d) {
 
 });
 
+
+// bid view modal - analyze btn
+$("#analyze-btn").click(function(d) {
+	$("#analyze-bid-modal").modal();
+})
+
 // collapse window in history window panels
 $(document).on('click','.panelcol',function(d){
 	var pn = this.parentElement.parentElement.parentElement.parentElement.children[1];
@@ -702,6 +708,7 @@ function historytablerefresh(datatable,table,data){
 	datatable = $("#"+table).DataTable({
 		"bPaginate" : true,
 		"aaData" : data,
+		"autoWidth": false,
 		"aoColumns" : [
 			{"data": "bid_id"},
 			{"data": "vendor_id"},

@@ -548,6 +548,10 @@
                 </div>
             </div>    
         </div>
+		
+		
+		
+		
 
     	 <!--  Bid panal  -->
         <div id="bid-view-modal" class="modal fade" role="dialog">
@@ -689,6 +693,74 @@
             </div>    
         </div>
         
+		
+		 <!--  Analyze bids  -->
+        <div id="analyze-bid-modal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                
+            <!--   modal content   -->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <!--    cross button   -->
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title" id="analyze-bids-header">Analyze bids</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row" id="bids">
+                            <div class="col-lg-12">
+								<div id="myCarousel" class="carousel slide" data-ride="carousel">
+									<!-- Carousel indicators -->
+									<ol class="carousel-indicators">
+										<li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+										<li data-target="#myCarousel" data-slide-to="1"></li>
+										<li data-target="#myCarousel" data-slide-to="2"></li>
+										<li data-target="#myCarousel" data-slide-to="3"></li>
+									</ol>
+									
+									
+									<!-- Wrapper for slides -->
+									<div class="carousel-inner" role="listbox">
+										<div class="item active">
+										  <svg id="lineChart" width="960" height="500"></svg>
+										</div>
+
+										<div class="item">
+										   <canvas id="barChart" width="400" height="400"></canvas>
+										</div>
+
+										<div class="item">
+										   <canvas id="myChart" width="400" height="400"></canvas>
+										</div>
+
+										<div class="item">
+										   <canvas id="myChart" width="400" height="400"></canvas>
+										</div>
+									</div>
+									
+									  <!-- Left and right controls -->
+									<div class="row">
+										<div class="col-lg-12">
+											<a class = "pull-left" href = "#myCarousel" data-slide = "prev">
+												<i class="fa fa-chevron-left fa-3x" aria-hidden="true"></i>
+											</a>
+											<a class = "pull-right" href = "#myCarousel" data-slide = "next">
+												<i class="fa fa-chevron-right fa-3x" aria-hidden="true"></i>
+											</a>
+										</div>
+									</div>
+									
+                              	
+								</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>    
+        </div>
 
 
     </div>
@@ -707,6 +779,8 @@
     <script src="https://cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap4.min.js"></script>
 	<script src="http://localhost:3000/admin/js/bootstrap-datepicker.js"></script>
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script src="http://localhost:3000/admin/js/charts.js"></script>
   
  
         
