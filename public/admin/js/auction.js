@@ -35,7 +35,7 @@ $(document).on('click','.editBtn',function (d){
 	var obj = {"auction_id":aid};
     //update form
 	$.ajax({
-		url : "http://127.0.0.1:3000/auctions/edit",
+		url : "http://localhost:3000/auctions/edit",
 		type : "POST",
 		dataType : "json",
 		data : obj,
@@ -94,7 +94,7 @@ $(document).on('click','.bidBtn',function (d){
 	$("#bids").html("");
 	$("#bid-header").text(bidname+" : "+biduid);
 	$.ajax({
-		url : "http://127.0.0.1:3000/items/aucitems",
+		url : "http://localhost:3000/items/aucitems",
 		type : "POST",
 		data : obj,
 		dataType : "json",
@@ -122,7 +122,7 @@ $(document).on('click','.ongoing-btn',function(d){
 	var uid = this.lastElementChild.innerHTML;
 	var obj = {"auction_id":uid};
 	$.ajax({
-		url: "http://127.0.0.1:3000/auctions/ongoing",
+		url: "http://localhost:3000/auctions/ongoing",
 		data: obj,
 		dataType: 'json',
 		type: 'post',
@@ -183,12 +183,12 @@ $("#bid-min-conf").click(function (d){
 $("#win-conf-auc-btn").click(function (d){
 	if(newaucenabled){
 		var obj= createJSON();
-		var path = "http://127.0.0.1:3000/auctions/new";
+		var path = "http://localhost:3000/auctions/new";
 		sendDatabyPost(path,obj,"New Auction Added");
 	}
 	else{
 		var obj = createJSON();
-		var path = "http://127.0.0.1:3000/auctions/edit/confirm";
+		var path = "http://localhost:3000/auctions/edit/confirm";
 		sendDatabyPost(path,obj,"Auction Status Changed");
 	}
 });
@@ -219,14 +219,14 @@ $("#bid-min-close").click(function (d){
 $("#del-auc-btn").click(function(d) {
     //ajax to del
 	var json = { "auction_id" : deluid };
-    var path = "http://127.0.0.1:3000/auctions/del"; //give path
+    var path = "http://localhost:3000/auctions/del"; //give path
     $.ajax({
         url : path,
         dataType: "json",
         data : json,
         type : "POST",
         success:function(data,textStatus,jqXHR){
-            sendDatatoUpdate({},"http://127.0.0.1:3000/auctions/initial");
+            sendDatatoUpdate({},"http://localhost:3000/auctions/initial");
         }
     })
 });
@@ -279,7 +279,7 @@ $("#history-btn").click(function(d) {
 		
 		$.ajax({
 			
-			url : "http://127.0.0.1:3000/bids/historyad",
+			url : "http://localhost:3000/bids/historyad",
 			type : 'POST',
 			dataType : 'json',
 			data : obj,
@@ -447,7 +447,7 @@ function updatebids(){
 	var obj = {"auction_id":uid};
 	var id,name,bidval;
 	$.ajax({
-		url: "http://127.0.0.1:3000/bids/getlatest",
+		url: "http://localhost:3000/bids/getlatest",
 		type: 'POST',
 		data : obj,
 		dataType : 'json',
@@ -677,7 +677,7 @@ function tablerefresh(){
 		//send ajax
 
 		$.ajax({
-			url : "http://127.0.0.1:3000/auctions/edit",
+			url : "http://localhost:3000/auctions/edit",
 			type : "POST",
 			dataType : "json",
 			data : obj,
@@ -755,7 +755,7 @@ function sendDatabyPost(path,json,successmsg){
         dataType : 'json',
         data : json,
         success:function(data,textStatus,jqXHR){
-			sendDatatoUpdate({},"http://127.0.0.1:3000/auctions/initial");
+			sendDatatoUpdate({},"http://localhost:3000/auctions/initial");
         },
         fail:function(jqXHR,textStatus,errorThrown){
            
@@ -766,7 +766,7 @@ function sendDatabyPost(path,json,successmsg){
 // send data to update onogoing panel
 function sendDataOngoing(){
 	$.ajax({
-		url : "http://127.0.0.1:3000/auctions/current",
+		url : "http://localhost:3000/auctions/current",
 		type : "GET",
 		dataType : 'json',
 		success : function(data, textStatus, jqXHR){
@@ -809,7 +809,7 @@ window.onload = function(){
 //	$("#start-time").timepicker();
 //	$("#end-time").timepicker();
 	tablerefresh();
-	sendDatatoUpdate({},"http://127.0.0.1:3000/auctions/initial");	
+	sendDatatoUpdate({},"http://localhost:3000/auctions/initial");
 }
 
 
@@ -828,7 +828,7 @@ $(document).ready(function (d){
 		datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
 		queryTokenizer: Bloodhound.tokenizers.whitespace,
 		prefetch : {
-			url : "http://127.0.0.1:3000/users/vendorlist",
+			url : "http://localhost:3000/users/vendorlist",
 			filter : function(data){
 				return $.map(data,function(vennames){
 					return { 'name' : vennames.fname+" "+vennames.lname+"-"+vennames.user_id }
@@ -843,7 +843,7 @@ $(document).ready(function (d){
 		datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
 		queryTokenizer: Bloodhound.tokenizers.whitespace,
 		prefetch : {
-			url : "http://127.0.0.1:3000/items/itemlist",
+			url : "http://localhost:3000/items/itemlist",
 			filter : function(data){
 				return $.map(data,function(items){
 					return {'name': items.item_name+"-"+items.item_id}

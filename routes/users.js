@@ -161,9 +161,6 @@ router.get('/vendorlist', function(req, res, next) {
     });
 });
 
-
-
-
 router.get('/vendor/count', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
@@ -188,9 +185,7 @@ router.get('/vendor/count', function(req, res, next) {
     });
 });
 
-
-
-router.put('/edit/confirm', function(req, res, next) {
+router.post('/edit/confirm', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
     const data = {
@@ -199,11 +194,12 @@ router.put('/edit/confirm', function(req, res, next) {
         lname: req.body.lname,
         role: req.body.role,
         email: req.body.email,
-        date_cr: req.body.date_created,
         mob: req.body.mobile,
         comp: req.body.company,
         pwd: req.body.password
     };
+
+    console.log(data);
 
     pg.connect(connectionString, function(err, client, done) {
         // Handle connection errors
@@ -212,10 +208,13 @@ router.put('/edit/confirm', function(req, res, next) {
             console.log(err);
             return res.status(500).json({success: false, data: err});
         }
+
+        var date = new Date();
+        var curr_date = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate();
         // SQL Query > Select Data
         const query = client.query("UPDATE users SET fname=($1), lname=($2), role=($3), email=($4), " +
             "date_created=($5), mobile=($6), company=($7), password=($8) WHERE user_id=($9)",
-            [data.fname, data.lname, data.role, data.email, data.date_cr, data.mob, data.comp, data.pwd, data.uid]);
+            [data.fname, data.lname, data.role, data.email, curr_date, data.mob, data.comp, data.pwd, data.uid]);
         // Stream results back one row at a time
         query.on('row', function(row) {
             results.push(row);
@@ -255,6 +254,5 @@ router.delete('/del', function(req, res, next) {
         });
     });
 });
-
 
 module.exports = router;

@@ -124,7 +124,7 @@ router.post('/aucitems', function(req, res, next) {
     });
 });
 
-router.put('/edit/confirm', function(req, res, next) {
+router.post('/edit/confirm', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
     const data = {
