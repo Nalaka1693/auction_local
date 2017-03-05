@@ -305,6 +305,12 @@ $("#history-btn").click(function(d) {
 
 // bid view modal - analyze btn
 $("#analyze-btn").click(function(d) {
+	var aucid = this.parentElement.parentElement.children[0].children[1].innerHTML.split(": ")[1];
+	var aucname = this.parentElement.parentElement.children[0].children[1].innerHTML.split(": ")[0];
+	
+	var nItems = this.parentElement.parentElement.children[1].children[0].childElementCount;
+	$("#analyze-bids-header").text(aucname+" :: "+ aucid);
+	loadlinechart(aucid,nItems);
 	$("#analyze-bid-modal").modal();
 })
 

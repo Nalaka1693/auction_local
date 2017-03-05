@@ -131,7 +131,7 @@ router.post('/edit', function(req, res, next) {
     const data = {
         auc_id: req.body.auction_id
     };
-
+    console.log(data);
     pg.connect(connectionString, function(err, client, done) {
         // Handle connection errors
         if(err) {
