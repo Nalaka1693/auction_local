@@ -184,12 +184,9 @@ router.post('/add/confirm', function(req, res, next) {
     });
 });
 
-router.post('/history', function(req, res, next) {
+router.get('/history', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
-    const data = {
-        auc_id: req.body.auction_id
-    };
 
     pg.connect(connectionString, function(err, client, done) {
         // Handle connection errors
@@ -200,7 +197,7 @@ router.post('/history', function(req, res, next) {
         }
 
         // SQL Query > Insert Data
-        var query = client.query("SELECT item_id, bid_amount FROM bid GROUP BY vendor_id, time LIMIT 20");
+        var query = client.query("SELECT * FROM bid");
 
         // Stream results back one row at a time
         query.on('row', function(row) {
