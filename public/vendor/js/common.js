@@ -1,35 +1,21 @@
 /**
  * Created by PC on 2/27/2017.
  */
-// variables
-var addbid;
-/*var obj = [
- {
- "name" : "auc 1",
- "auction_id": "12345"
- },
- {
- "name": "auc 2",
- "auction_id": "23456"
- }
- ]
- */
+
 function loadModalData(data) {
     $("#modal").html("");
 
     $.ajax({
-        url: "http://localhost:3000/bids/add",
+        url:"http://localhost:3000/bids/add",
         type: "POST",
         dataType: "json",
         data : data,
         success:function (data,textStatus,jqXHR) {
             var bid = jqXHR.responseJSON;
-
             bid.forEach(updateModal);
             $("#myModal").modal();
         }
     })
-
 }
 
 
@@ -38,17 +24,27 @@ function updateModal(data) {
 
     $('#modal').append(
 
-            '<div class="col-sm-4"><font color="#703577" size="5" style="font-family:Tw Cen MT"><strong>'+data.item_id+'</strong></font><br>'+
-                '<strong><h4 style="color:red">Current Lowest Bid</h4></strong>'+
-                '<h3 style="color:green; size:13">'+data.min+' $</h3>'+
-                    '<div><strong>Update Your Bid</strong></div><br>'+
-                        '<div class="input-prepend input-append margin-2">'+
-                            '<div style="padding-left:0px">'+
-                                '<input class="margin-b0 margin-l0 input-mini earnedSum" name="Bid01" size="4" color="red" type="text" placeholder="XXXX$"><h15>$</h15>'+
+    //    edit here
+    '<div class="col-md-4">'+
+        '<div class="panel panel-primary"  style="color:#0d8aad">'+
+            '<div class="panel-heading">'+
+                    '<div class="row">'+
+                            // '<div class="col-lg-1"></div>'+
+                            '<div class="col-sm-12 text-center">'+
+                                '<div class="medium" id="vcount"><center><strong>'+data.item_name+'</strong></center></div>'+
+                                '<div class="medium"><center><strong>'+data.item_id+'</strong></center></div>'+
                             '</div>'+
-                        '</div>'+
-            '</div>'
-
+                    '</div>'+
+            '</div>'+
+                '<div class="panel-footer">'+
+                    '<span class="pull-center"><center>Current Lowest Bid</center></span>'+
+                    '<span class="pull-center"><center>'+data.min+'$</center></span>'+
+                    '<span class="pull-center"><center>Update Your Bid</center></span>'+
+                    '<input class="form-control margin-b0 margin-l0 input-mini earnedSum" name="Bid01" size="3" color="red" type="text" placeholder="$XXXXXXXXXXX">'+
+                    '<div class="clearfix"></div>'+
+                '</div>'+
+        '</div>'+
+    '</div>'
     )
 }
 

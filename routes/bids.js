@@ -80,8 +80,6 @@ router.post('/getlatest', function(req, res, next) {
     });
 });
 
-
-
 router.post('/historyad', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
@@ -117,9 +115,6 @@ router.post('/historyad', function(req, res, next) {
     });
 });
 
-
-
-
 router.post('/bidbyauction', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
@@ -153,8 +148,6 @@ router.post('/bidbyauction', function(req, res, next) {
         });
     });
 });
-
-
 
 router.get('/test', function(req, res, next) {
     const results = [];
@@ -238,7 +231,7 @@ router.get('/history', function(req, res, next) {
         }
 
         // SQL Query > Insert Data
-        var query = client.query("SELECT * FROM bid");
+        var query = client.query("SELECT * FROM bid ORDER BY bid_id DESC");
 
         // Stream results back one row at a time
         query.on('row', function(row) {

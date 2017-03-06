@@ -71,7 +71,6 @@ router.post('/new', function(req, res, next) {
         due_date: req.body.due_date,
         s_time: req.body.start_time,
         e_time: req.body.end_time,
-        date_cr: req.body.date_created,
         cr_user: req.body.created_by,
         vendors: req.body.vendors,
         items: req.body.items,
@@ -88,7 +87,6 @@ router.post('/new', function(req, res, next) {
 
         var date = new Date();
         var curr_date = date.getFullYear() +'-'+ date.getMonth() +'-'+ date.getDate();
-        var curr_time = date.getHours()+':'+date.getMinutes()+':'+date.getSeconds();
         // SQL Query > Insert Data
         const query = client.query("INSERT INTO auction(auction_id, description, name, due_date, start_time, end_time, date_created, created_by) " +
             "values($1, $2, $3, $4, $5, $6, $7, $8)",
@@ -104,7 +102,7 @@ router.post('/new', function(req, res, next) {
 
         data.item_val.forEach(function (ival) {
             client.query("INSERT INTO bid (auction_id,item_id,vendor_id,time,bid_amount) VALUES ($1,$2,$3,$4,$5)",
-                [data.auc_id,ival.item_id,data.cr_user,curr_time,ival.value]);
+                [data.auc_id,ival.item_id,data.cr_user,getTime(),ival.value]);
         });
 
 
@@ -170,16 +168,18 @@ router.post('/edit/confirm', function(req, res, next) {
     // Get a Postgres client from the connection pool
     const data = {
         auc_id: req.body.auction_id,
-        descrip: req.body.descrip,
+        descrip: req.body.description,
         name: req.body.name,
         due_date: req.body.due_date,
-        s_time: req.body.s_time,
-        e_time: req.body.e_time,
-        date_cr: req.body.date_created,
+        s_time: req.body.start_time,
+        e_time: req.body.end_time,
         cr_user: req.body.created_by,
         vendors: req.body.vendors,
-        items: req.body.items
+        items: req.body.items,
+        item_val: req.body.item_value
     };
+
+    console.log(data);
 
     pg.connect(connectionString, function(err, client, done) {
         // Handle connection errors
@@ -188,17 +188,33 @@ router.post('/edit/confirm', function(req, res, next) {
             console.log(err);
             return res.status(500).json({success: false, data: err});
         }
+        var date = new Date();
+        var curr_date = date.getFullYear() +'-'+ date.getMonth() +'-'+ date.getDate();
+
         // SQL Query > Update Data
         var query = client.query("UPDATE auction SET description=($2), name=($3), due_date=($4), start_time=($5), " +
             "end_time=($6), date_created=($7), created_by=($8) WHERE auction_id=($1)",
-            [data.auc_id, data.descrip, data.name, data.due_date, data.s_time, data.e_time, data.date_cr, data.cr_user]);
+            [data.auc_id, data.descrip, data.name, data.due_date, data.s_time, data.e_time, curr_date, data.cr_user]);
 
         data.vendors.forEach(function (vendor) {
-            client.query("UPDATE auction_vendors SET user_id");
+            console.log('vendor');
+            client.query("UPDATE auction_vendors SET user_id=($1) WHERE auction_id=($2)", [vendor, data.auc_id]);
+        });
+
+        data.items.forEach(function (item) {
+            console.log('item');
+            client.query("UPDATE auction_items SET item_id=($1) WHERE auction_id=($2)", [item, data.auc_id]);
+        });
+
+        data.item_val.forEach(function (ival) {
+            console.log('val');
+            query = client.query("UPDATE bid SET item_id=($1) ,vendor_id=($2), time=($3), bid_amount=($4) WHERE auction_id=($5)",
+                [ival.item_id, data.cr_user, getTime(), ival.value, data.auc_id]);
         });
 
         // Stream results back one row at a time
         query.on('row', function(row) {
+            console.log('row');
             results.push(row);
         });
         // After all data is returned, close connection and return results
@@ -299,5 +315,20 @@ router.get('/initial', function(req, res, next) {
         });
     });
 });
+
+function getTime() {
+    var date = new Date();
+
+    var hour = date.getHours();
+    hour = (hour < 10 ? "0" : "") + hour;
+
+    var min  = date.getMinutes();
+    min = (min < 10 ? "0" : "") + min;
+
+    var sec  = date.getSeconds();
+    sec = (sec < 10 ? "0" : "") + sec;
+
+    return  hour + ":" + min + ":" + sec;
+}
 
 module.exports = router;
