@@ -43,6 +43,7 @@ router.post('/logpost', function(req, res, next) {
                 } else if (results[0].role.toUpperCase() == 'VENDOR') {
                     res.sendFile(__dirname + '/vendor_pages/index.html');
                 }
+                req.session.userID =req.body.uname;
             } else {
                 return res.redirect('http://localhost:3000/');
             }

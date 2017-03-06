@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var cors = require('cors');
 var Promise = require('es6-promise').Promise;
+var session = require("client-sessions");
 
 var bids = require('./routes/bids');
 var index = require('./routes/index');
@@ -28,6 +29,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'routes')));
+app.use(session({
+    cookieName: 'session',
+    secret: 'qwertyui12345678',
+    duration: 30 * 60 * 1000,
+    activeDuration: 5 * 60 * 1000
+}));
 app.use(cors());
 app.all('*',function (req,res,next) {
     res.header("Access-Control-Allow-Origin",'*');
@@ -35,6 +42,7 @@ app.all('*',function (req,res,next) {
     res.header("Access-Control-Allow-Headers",'ContentType');
     next();
 }) ;
+
 
 
 app.use('/', login);

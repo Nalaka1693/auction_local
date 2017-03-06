@@ -194,7 +194,7 @@ router.post('/edit/confirm', function(req, res, next) {
         // SQL Query > Update Data
         var query = client.query("UPDATE auction SET description=($2), name=($3), due_date=($4), start_time=($5), " +
             "end_time=($6), date_created=($7), created_by=($8) WHERE auction_id=($1)",
-            [data.auc_id, data.descrip, data.name, data.due_date, data.s_time, data.e_time, curr_date, data.cr_user]);
+            [data.auc_id, data.descrip, data.name, data.due_date, data.s_time, data.e_time, curr_date, req.session.userID]);
 
         data.vendors.forEach(function (vendor) {
             console.log('vendor');

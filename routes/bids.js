@@ -16,7 +16,7 @@ router.post('/add', function(req, res, next) {
     const data = {
         auc_id: req.body.auction_id
     };
-
+    console.log(req.session.userID);
     pg.connect(connectionString, function(err, client, done) {
         // Handle connection errors
         if(err) {
@@ -198,11 +198,11 @@ router.post('/add/confirm', function(req, res, next) {
         var curr_time = getTime();
 
         var query;
-
+        console.log(req.session.userID);
         // SQL Query > Insert Data
         for (var i = 0; i < data.i_id.length; ++i) {
             query = client.query("INSERT INTO bid(auction_id, item_id, vendor_id, time, bid_amount) values($1, $2, $3, $4, $5)",
-                [data.auc_id, data.i_id[i], data.ven_id, curr_time, data.bid_amnt[i]]);
+                [data.auc_id, data.i_id[i], req.session.userID, curr_time, data.bid_amnt[i]]);
         }
 
         // Stream results back one row at a time

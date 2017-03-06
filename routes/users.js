@@ -161,6 +161,9 @@ router.get('/vendorlist', function(req, res, next) {
     });
 });
 
+
+
+
 router.get('/vendor/count', function(req, res, next) {
     const results = [];
     // Get a Postgres client from the connection pool
@@ -254,5 +257,6 @@ router.delete('/del', function(req, res, next) {
         });
     });
 });
+
 
 module.exports = router;
