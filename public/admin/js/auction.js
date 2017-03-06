@@ -800,6 +800,7 @@ function loadtable(data){
 
 //---------------intial----------------------------//
 window.onload = function(){
+
 	item_list=[];
 	vendor_list =[];
 	p_data={"data":[]};
