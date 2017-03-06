@@ -302,6 +302,18 @@ $("#history-btn").click(function(d) {
 
 });
 
+
+// bid view modal - analyze btn
+$("#analyze-btn").click(function(d) {
+	var aucid = this.parentElement.parentElement.children[0].children[1].innerHTML.split(": ")[1];
+	var aucname = this.parentElement.parentElement.children[0].children[1].innerHTML.split(": ")[0];
+	
+	var nItems = this.parentElement.parentElement.children[1].children[0].childElementCount;
+	$("#analyze-bids-header").text(aucname+" :: "+ aucid);
+	loadlinechart(aucid,nItems);
+	$("#analyze-bid-modal").modal();
+})
+
 // collapse window in history window panels
 $(document).on('click','.panelcol',function(d){
 	var pn = this.parentElement.parentElement.parentElement.parentElement.children[1];
@@ -702,6 +714,7 @@ function historytablerefresh(datatable,table,data){
 	datatable = $("#"+table).DataTable({
 		"bPaginate" : true,
 		"aaData" : data,
+		"autoWidth": false,
 		"aoColumns" : [
 			{"data": "bid_id"},
 			{"data": "vendor_id"},
